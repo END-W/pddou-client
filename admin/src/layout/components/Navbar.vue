@@ -8,6 +8,7 @@
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <span class="name">{{ name }}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -16,11 +17,32 @@
               首页
             </el-dropdown-item>
           </router-link>
+          <el-dropdown-item @click.native="dialogFormVisible = true">
+            修改密码
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出登录</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+
+      <el-dialog width="35%" title="修改密码" :visible.sync="dialogFormVisible">
+        <el-form ref="form" :model="form" :rules="rules">
+          <el-form-item prop="password" label="当前密码" :label-width="formLabelWidth">
+            <el-input v-model="form.password" type="password" placeholder="密码长度6到30位，包含数字、字母、特殊符号中任意两种" autocomplete="off" />
+          </el-form-item>
+          <el-form-item prop="newPassword" label="新密码" :label-width="formLabelWidth">
+            <el-input v-model="form.newPassword" type="password" placeholder="新密码不能和当前密码相同" autocomplete="off" />
+          </el-form-item>
+          <el-form-item prop="confirmPassword" label="确认密码" :label-width="formLabelWidth">
+            <el-input v-model="form.confirmPassword" type="password" placeholder="确认密码和新密码保持一致" autocomplete="off" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button :loading="loading" type="primary" @click.native="changePassword">确定</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -29,21 +51,49 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { validPassword } from '@/utils/validate'
 
 export default {
   components: {
     Breadcrumb,
     Hamburger
   },
+  data() {
+    const validatePassword = (rule, value, callback) => {
+      if (!validPassword(value)) {
+        callback(new Error('密码格式错误'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      dialogFormVisible: false,
+      formLabelWidth: '80px',
+      form: {
+        password: '',
+        newPassword: '',
+        confirmPassword: ''
+      },
+      rules: {
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        newPassword: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        confirmPassword: [{ required: true, trigger: 'blur', validator: validatePassword }]
+      },
+      loading: false
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'name'
     ])
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
+    },
+    async changePassword() {
     },
     async logout() {
       await this.$store.dispatch('user/logout')
@@ -117,6 +167,12 @@ export default {
           width: 40px;
           height: 40px;
           border-radius: 10px;
+          vertical-align: top;
+        }
+
+        .name {
+          cursor: pointer;
+          margin-left: 10px;
         }
 
         .el-icon-caret-bottom {

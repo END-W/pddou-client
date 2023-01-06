@@ -17,3 +17,11 @@ export function isExternal(path) {
 export function validUsername(str) {
   return str.trim() !== '' && str.trim().length >= 3
 }
+
+/**
+ * @param {string} str
+ * @returns {Boolean}
+ */
+export function validPassword(password) {
+  return /^(?![a-zA-Z]+$)(?!\d+$)(?![^\da-zA-Z\s]+$).{1,9}$/.test(password)
+}
