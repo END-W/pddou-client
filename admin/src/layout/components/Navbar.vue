@@ -17,7 +17,7 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <el-dropdown-item @click.native="dialogFormVisible = true">
+          <el-dropdown-item @click.native="changePwdForm">
             修改密码
           </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
@@ -34,8 +34,16 @@
           <el-form-item prop="newPassword" label="新密码" :label-width="formLabelWidth">
             <el-input v-model="form.newPassword" type="password" placeholder="新密码不能和当前密码相同" autocomplete="off" />
           </el-form-item>
-          <el-form-item prop="confirmPassword" label="确认密码" :label-width="formLabelWidth">
-            <el-input v-model="form.confirmPassword" type="password" placeholder="确认密码和新密码保持一致" autocomplete="off" />
+          <el-form-item label="确认密码" :label-width="formLabelWidth">
+            <el-input
+              v-model="form.confirmPassword"
+              type="password"
+              placeholder="确认密码和新密码保持一致"
+              autocomplete="off"
+              @blur="onConfirmPwd($event)"
+            />
+            <div v-if="isActive" class="error">密码格式错误</div>
+            <div v-if="isActive2" class="error">确认密码和新密码不一致</div>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -49,9 +57,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { Message } from 'element-ui'
+import store from '@/store'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import md5 from 'js-md5'
 import { validPassword } from '@/utils/validate'
+import { changePassword } from '@/api/employee'
 
 export default {
   components: {
@@ -69,15 +81,17 @@ export default {
     return {
       dialogFormVisible: false,
       formLabelWidth: '80px',
+      isActive: false,
+      isActive2: false,
+      isOpen: false,
       form: {
         password: '',
         newPassword: '',
         confirmPassword: ''
       },
       rules: {
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        newPassword: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        confirmPassword: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ trigger: 'blur', validator: validatePassword }],
+        newPassword: [{ trigger: 'blur', validator: validatePassword }]
       },
       loading: false
     }
@@ -93,7 +107,74 @@ export default {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
-    async changePassword() {
+    refRemoveClass(ref_info, class_name) {
+      ref_info.forEach((element) => {
+        console.log(element)
+        // 区分是否为组件内，使用需要用 $el
+        const class_name_arr = element.$el
+          ? element.$el.className.split(' ')
+          : element.className.split(' ')
+        const index = class_name_arr.findIndex((item) => {
+          return item === class_name
+        })
+        if (index !== -1) class_name_arr.splice(index, 1)
+        // 区分是否为组件内，使用需要用 $el
+        if (element.$el) {
+          element.$el.className = class_name_arr.join(' ')
+        } else {
+          element.className = class_name_arr.join(' ')
+        }
+      })
+    },
+    changePwdForm() {
+      this.dialogFormVisible = true
+      this.loading = false
+    },
+    onConfirmPwd(event) {
+      if (!validPassword(this.form.confirmPassword)) {
+        this.isActive = true
+        this.isActive2 = false
+        this.isOpen = false
+      } else {
+        this.isActive = false
+        if (this.form.confirmPassword !== this.form.newPassword) {
+          this.isActive2 = true
+          this.isActive = false
+          this.isOpen = false
+        } else {
+          this.isActive2 = false
+          this.isOpen = true
+        }
+      }
+    },
+    changePassword() {
+      this.$refs.form.validate(valid => {
+        if (valid && this.isOpen) {
+          this.loading = true
+          changePassword({ password: md5(this.form.password), newPassword: md5(this.form.newPassword) }).then(response => {
+            this.dialogFormVisible = false
+            this.isOpen = false
+            this.form.password = ''
+            this.form.newPassword = ''
+            this.form.confirmPassword = ''
+            this.loading = false
+            Message({
+              message: '修改密码成功',
+              type: 'success',
+              duration: 2 * 1000
+            })
+            setTimeout(() => {
+              store.dispatch('user/resetToken').then(() => {
+                location.reload()
+              })
+            }, 2000)
+          }).catch(() => {
+            this.loading = false
+          })
+        } else {
+          return false
+        }
+      })
     },
     async logout() {
       await this.$store.dispatch('user/logout')
@@ -182,6 +263,18 @@ export default {
           top: 25px;
           font-size: 12px;
         }
+      }
+    }
+
+    .el-form-item__content {
+      .error {
+        color: #F56C6C;
+        font-size: 12px;
+        line-height: 1;
+        padding-top: 4px;
+        position: absolute;
+        top: 100%;
+        left: 0;
       }
     }
   }

@@ -15,6 +15,14 @@ export function getInfo() {
   })
 }
 
+export function changePassword(data) {
+  return request({
+    url: '/admin/auth/changePwd',
+    method: 'post',
+    data
+  })
+}
+
 export function logout() {
   return request({
     url: '/admin/auth/logout',
