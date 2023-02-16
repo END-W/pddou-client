@@ -51,43 +51,8 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }]
-  },
-
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
   }
 ]
 
@@ -96,6 +61,27 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
+  {
+    path: '/employee',
+    component: Layout,
+    redirect: '/employee/index',
+    alwaysShow: true,
+    name: 'Employee',
+    meta: {
+      title: '员工管理',
+      icon: 'employee',
+      roles: ['SUPERADMIN', "ADMIN", 'STORE']
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/employee/index'),
+        name: 'EmployeeList',
+        meta: { title: '员工列表', icon: 'list' }
+      }
+    ]
+  },
+
   {
     path: '/nested',
     component: Layout,

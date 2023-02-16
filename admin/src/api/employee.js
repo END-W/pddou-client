@@ -29,3 +29,27 @@ export function logout() {
     method: 'post'
   })
 }
+
+export function fetchEmployeeList(query) {
+  return request({
+    url: '/admin/employee/list',
+    method: 'get',
+    params: query
+  })
+}
+
+export function removeEmployee(data) {
+  return request({
+    url: '/admin/employee/delete',
+    method: 'delete',
+    params: data
+  })
+}
+
+export function employeeStateChanged(data) {
+  return request({
+    url: '/admin/employee/changeStatus',
+    method: 'post',
+    data
+  })
+}
