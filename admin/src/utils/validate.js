@@ -25,3 +25,19 @@ export function validUsername(str) {
 export function validPassword(password) {
   return /^(?![a-zA-Z]+$)(?!\d+$)(?![^\da-zA-Z\s]+$).{6,30}$/.test(password)
 }
+
+/**
+ * @param {string} str
+ * @returns {Boolean}
+ */
+export function validEmail(email) {
+  return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+}
+
+/**
+ * @param {string} str
+ * @returns {Boolean}
+ */
+export function validPhone(phone) {
+  return /^1[3456789]\d{9}$/.test(phone)
+}

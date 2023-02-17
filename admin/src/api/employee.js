@@ -38,6 +38,22 @@ export function fetchEmployeeList(query) {
   })
 }
 
+export function addEmployee(data) {
+  return request({
+    url: '/admin/employee/add',
+    method: 'post',
+    data
+  })
+}
+
+export function editEmployee(data) {
+  return request({
+    url: '/admin/employee/update',
+    method: 'put',
+    data
+  })
+}
+
 export function removeEmployee(data) {
   return request({
     url: '/admin/employee/delete',

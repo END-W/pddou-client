@@ -27,8 +27,8 @@
         </span>
         <el-input
           :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
+          ref="tempPasword"
+          v-model="loginForm.tempPasword"
           :type="passwordType"
           placeholder="Password"
           name="password"
@@ -71,11 +71,12 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '123456'
+        password: '',
+        tempPasword: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        tempPasword: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
       passwordType: 'password',
@@ -98,14 +99,14 @@ export default {
         this.passwordType = 'password'
       }
       this.$nextTick(() => {
-        this.$refs.password.focus()
+        this.$refs.tempPasword.focus()
       })
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.loginForm.password = md5(this.loginForm.password)
+          this.loginForm.password = md5(this.loginForm.tempPasword)
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
