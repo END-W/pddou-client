@@ -62,6 +62,27 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
+    path: '/user',
+    component: Layout,
+    redirect: '/user/index',
+    alwaysShow: true,
+    name: 'User',
+    meta: {
+      title: '用户管理',
+      icon: 'user',
+      roles: ['SUPERADMIN', 'ADMIN']
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/user/index'),
+        name: 'UserList',
+        meta: { title: '用户列表', icon: 'list' }
+      }
+    ]
+  },
+
+  {
     path: '/employee',
     component: Layout,
     redirect: '/employee/index',
@@ -70,7 +91,7 @@ export const asyncRoutes = [
     meta: {
       title: '员工管理',
       icon: 'employee',
-      roles: ['SUPERADMIN', "ADMIN", 'STORE']
+      roles: ['SUPERADMIN', 'ADMIN', 'STORE']
     },
     children: [
       {
@@ -78,6 +99,38 @@ export const asyncRoutes = [
         component: () => import('@/views/employee/index'),
         name: 'EmployeeList',
         meta: { title: '员工列表', icon: 'list' }
+      }
+    ]
+  },
+
+  {
+    path: '/movie',
+    component: Layout,
+    redirect: '/movie/list',
+    name: 'Movie',
+    meta: {
+      title: '电影管理',
+      icon: 'movie'
+    },
+    children: [
+      {
+        path: 'create',
+        component: () => import('@/views/movie/create'),
+        name: 'CreateMovie',
+        meta: { title: '添加电影', icon: 'edit' }
+      },
+      {
+        path: 'edit/:id(\\d+)',
+        component: () => import('@/views/movie/edit'),
+        name: 'EditMovie',
+        meta: { title: '编辑电影', noCache: true, activeMenu: '/movie/list' },
+        hidden: true
+      },
+      {
+        path: 'list',
+        component: () => import('@/views/movie/list'),
+        name: 'MovieList',
+        meta: { title: '电影列表', icon: 'list' }
       }
     ]
   },

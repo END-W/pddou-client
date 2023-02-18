@@ -26,7 +26,7 @@
       </el-col>
       <el-col :span="4" v-if="'ADMIN' !== roles[0]">
         <el-button type="primary" @click="addDialogVisible = true"
-          >添加用户</el-button
+          >添加员工</el-button
         >
       </el-col>
     </el-row>
@@ -91,7 +91,7 @@
         class-name="status-col"
         width="130"
         align="center"
-        label="账号类型"
+        label="角色类型"
       >
         <template slot-scope="{ row }">
           <el-tag :type="row.userType | userTypeFilter">
@@ -379,6 +379,8 @@ export default {
   methods: {
     getEmployeeList() {
       this.listLoading = true
+      if (this.listQuery.username !== '') this.listQuery.username = this.listQuery.username.trim()
+      if (this.listQuery.phone !== '') this.listQuery.phone = this.listQuery.phone.trim()
       fetchEmployeeList(this.listQuery).then((response) => {
         this.employeeList = response.data.list
         this.total = response.data.total
