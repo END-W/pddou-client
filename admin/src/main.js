@@ -22,6 +22,8 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
+Vue.prototype.$uploadUrl = process.env.VUE_APP_BASE_API + '/admin/upload/image'
+
 new Vue({
   el: '#app',
   router,

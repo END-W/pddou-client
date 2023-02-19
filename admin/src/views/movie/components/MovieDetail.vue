@@ -6,14 +6,14 @@
       :rules="rules"
       class="form-container"
     >
-      <sticky :z-index="10" :class-name="'sub-navbar ' + postForm.status">
+      <sticky :z-index="10" :class-name="'sub-navbar ' + status">
         <el-button
           v-loading="loading"
           style="margin-left: 10px"
           type="success"
           @click="submitForm"
         >
-          添加电影
+          发布
         </el-button>
       </sticky>
 
@@ -40,7 +40,7 @@
               <el-row>
                 <el-col :span="8">
                   <el-form-item
-										prop="director"
+                    prop="director"
                     label-width="60px"
                     label="导演:"
                     class="postInfo-container-item"
@@ -54,7 +54,7 @@
 
                 <el-col :span="10">
                   <el-form-item
-										prop="publicDate"
+                    prop="publicDate"
                     label-width="120px"
                     label="上映时间:"
                     class="postInfo-container-item"
@@ -63,7 +63,7 @@
                       v-model="postForm.publicDate"
                       type="date"
                       format="yyyy 年 MM 月 dd 日"
-											value-format="yyyy-MM-dd"
+                      value-format="yyyy-MM-dd"
                       placeholder="选择日期"
                     />
                   </el-form-item>
@@ -71,7 +71,7 @@
 
                 <el-col :span="6">
                   <el-form-item
-										prop="actor"
+                    prop="actor"
                     label-width="90px"
                     label="主演:"
                     class="postInfo-container-item"
@@ -87,7 +87,7 @@
               <el-row>
                 <el-col :span="9">
                   <el-form-item
-										prop="language"
+                    prop="language"
                     label-width="60px"
                     label="语言:"
                     class="postInfo-container-item"
@@ -109,7 +109,7 @@
 
                 <el-col :span="9">
                   <el-form-item
-										prop="type"
+                    prop="type"
                     label-width="75px"
                     label="类型:"
                     class="postInfo-container-item"
@@ -128,7 +128,7 @@
 
                 <el-col :span="6">
                   <el-form-item
-										prop="movieLong"
+                    prop="movieLong"
                     label-width="90px"
                     label="片长:"
                     class="postInfo-container-item"
@@ -154,15 +154,18 @@
           </el-input>
         </el-form-item>
 
-        <el-form-item prop="poster" style="margin-bottom: 30px"> </el-form-item>
+        <el-form-item prop="poster" style="margin-bottom: 30px">
+          <Upload v-model="postForm.poster" :url="uploadUrl" />
+        </el-form-item>
       </div>
     </el-form>
   </div>
 </template>
 
 <script>
-// import Upload from '@/components/Upload/SingleImage3'
+import Upload from '@/components/Upload/SingleImage3'
 import Sticky from '@/components/Sticky' // 粘性header组件
+import { fetchMovie, addMovie, editMovie } from '@/api/movie'
 
 const defaultForm = {
   name: '', // 电影名
@@ -174,13 +177,12 @@ const defaultForm = {
   intro: '', // 电影简介
   type: '', // 电影类型
   publicDate: '', // 电影上映时间
-  status: 'draft',
   id: undefined,
 }
 
 export default {
   name: 'MovieDetail',
-  components: { Sticky },
+  components: { Upload, Sticky },
   props: {
     isEdit: {
       type: Boolean,
@@ -196,6 +198,21 @@ export default {
         })
         callback(new Error(rule.field + '为必传项'))
       } else {
+        callback()
+      }
+    }
+    const validateMovieLong = (rule, value, callback) => {
+      if (value === '') {
+        this.$message({
+          message: rule.field + '为必传项',
+          type: 'error',
+        })
+        callback(new Error(rule.field + '为必传项'))
+      } else {
+        const regExp = /^[0-9]+分钟$/
+        if (!regExp.test(value)) {
+          callback(new Error('格式为XXX分钟'))
+        }
         callback()
       }
     }
@@ -283,13 +300,14 @@ export default {
         name: [{ validator: validateRequire }],
         director: [{ validator: validateRequire }],
         actor: [{ validator: validateRequire }],
-        movieLong: [{ validator: validateRequire }],
+        movieLong: [{ validator: validateMovieLong, trigger: 'blur' }],
         language: [{ validator: validateRequire }],
         intro: [{ validator: validateRequire }],
         type: [{ validator: validateRequire }],
-        publicDate: [{ validator: validateRequire }]
+        publicDate: [{ validator: validateRequire }],
       },
-      tempRoute: {},
+      uploadUrl: this.$uploadUrl,
+      status: 'draft'
     }
   },
   created() {
@@ -297,57 +315,61 @@ export default {
       const id = this.$route.params && this.$route.params.id
       this.fetchData(id)
     }
-
-    // Why need to make a copy of this.$route here?
-    // Because if you enter this page and quickly switch tag, may be in the execution of the setTagsViewTitle function, this.$route is no longer pointing to the current page
-    // https://github.com/PanJiaChen/vue-element-admin/issues/1221
-    this.tempRoute = Object.assign({}, this.$route)
   },
   methods: {
     fetchData(id) {
-        // fetchArticle(id).then(response => {
-        //   this.postForm = response.data
-        //   // just for test
-        //   this.postForm.title += `   Article Id:${this.postForm.id}`
-        //   this.postForm.content_short += `   Article Id:${this.postForm.id}`
-        //   // set tagsview title
-        //   this.setTagsViewTitle()
-        //   // set page title
-        //   this.setPageTitle()
-        // }).catch(err => {
-        //   console.log(err)
-        // })
-    },
-    setTagsViewTitle() {
-      const title = 'Edit Article'
-      const route = Object.assign({}, this.tempRoute, {
-        title: `${title}-${this.postForm.id}`,
-      })
-      this.$store.dispatch('tagsView/updateVisitedView', route)
+      fetchMovie({movieId: id})
+        .then((response) => {
+          this.postForm = response.data
+          // set page title
+          this.setPageTitle()
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     setPageTitle() {
-      const title = 'Edit Article'
+      const title = '编辑电影'
       document.title = `${title} - ${this.postForm.id}`
     },
     submitForm() {
       console.log(this.postForm)
       this.$refs.postForm.validate((valid) => {
-        if (valid) {
+        if (valid && this.status !== 'published') {
           this.loading = true
-          this.$notify({
-            title: '成功',
-            message: '添加电影成功',
-            type: 'success',
-            duration: 2000,
-          })
-          this.postForm.status = 'published'
-          this.loading = false
+          if (this.postForm.id == undefined) {
+            addMovie(this.postForm).then((response) => {
+              this.$notify({
+                title: '成功',
+                message: '添加电影成功',
+                type: 'success',
+                duration: 2000,
+              })
+              this.status = 'published'
+              this.loading = false
+            }).catch((err) =>{
+              this.loading = false
+            })
+          } else {
+            editMovie(this.postForm).then((response) => {
+              this.$notify({
+                title: '成功',
+                message: '编辑电影成功',
+                type: 'success',
+                duration: 2000,
+              })
+              this.status = 'published'
+              this.loading = false
+            }).catch((err) =>{
+              this.loading = false
+            })
+          }
         } else {
           console.log('error submit!!')
           return false
         }
       })
-    }
+    },
   },
 }
 </script>

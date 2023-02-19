@@ -110,7 +110,8 @@ export const asyncRoutes = [
     name: 'Movie',
     meta: {
       title: '电影管理',
-      icon: 'movie'
+      icon: 'movie',
+      roles: ['SUPERADMIN', 'ADMIN']
     },
     children: [
       {
