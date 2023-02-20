@@ -54,11 +54,11 @@ export function editEmployee(data) {
   })
 }
 
-export function removeEmployee(data) {
+export function removeEmployee(query) {
   return request({
     url: '/admin/employee/delete',
     method: 'delete',
-    params: data
+    params: query
   })
 }
 

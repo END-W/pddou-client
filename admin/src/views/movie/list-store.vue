@@ -52,9 +52,17 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="2">
           <el-form-item>
             <el-button type="primary" @click="getMovieList">查询</el-button>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="4">
+          <el-form-item>
+            <el-button type="primary" @click="addDialogVisible = true"
+              >添加</el-button
+            >
           </el-form-item>
         </el-col>
       </el-row>
@@ -113,9 +121,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="100px" align="center" label="想看人数">
+      <el-table-column width="100px" align="center" label="票价">
         <template slot-scope="scope">
-          <span>{{ scope.row.wishNum }}</span>
+          <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
 
@@ -136,16 +144,20 @@
       <el-table-column min-width="160px" fixed="right" label="操作">
         <template slot-scope="scope">
           <el-button
+            type="primary"
+            size="small"
+            @click="showEditDialog(scope.row)"
+          >
+            编辑
+          </el-button>
+          <el-button
             type="danger"
             size="mini"
             style="margin-right: 10px"
-            @click="movieStateChanged(scope.row)"
+            @click="removeMovieByStore(scope.row.id)"
           >
-            {{ scope.row.isShow | reverseShow }}
+            删除
           </el-button>
-          <router-link :to="'/movie/edit/' + scope.row.id">
-            <el-button type="primary" size="small"> 编辑 </el-button>
-          </router-link>
         </template>
       </el-table-column>
     </el-table>
@@ -157,15 +169,78 @@
       :limit.sync="listQuery.limit"
       @pagination="getMovieList"
     />
+
+    <el-dialog title="添加电影" :visible.sync="addDialogVisible" width="30%">
+      <el-form
+        :model="addMovieForm"
+        ref="addMovieFormRef"
+        :rules="addMovieFormRules"
+        label-width="100px"
+      >
+        <el-form-item label="电影名" prop="movieId">
+          <el-select
+            v-model="addMovieForm.movieId"
+            filterable
+            remote
+            reserve-keyword
+						clearable
+            placeholder="请输入电影名"
+            :remote-method="getRemoteMovieList"
+          >
+            <el-option
+              v-for="item in movieListOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="票价" prop="price">
+          <el-input
+            style="width: 202px"
+            v-model="addMovieForm.price"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addMovieByStore">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="修改票价" :visible.sync="editDialogVisible" width="30%">
+      <el-form
+        :model="editMovieForm"
+        ref="editMovieFormRef"
+        :rules="editMovieFormRules"
+        label-width="70px"
+      >
+        <el-form-item label="票价" prop="price">
+          <el-input v-model="editMovieForm.price"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editMovieByStore">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchMovieList, movieStateChanged } from '@/api/movie'
+import {
+  fetchMovieListByStore,
+  fetchMovieByStore,
+  addMovieByStore,
+  editMovieByStore,
+  removeMovieByStore,
+} from '@/api/movie'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
-  name: 'MovieList',
+  name: 'MovieListByStore',
   components: { Pagination },
   filters: {
     isShowFilter(isShow) {
@@ -176,10 +251,6 @@ export default {
       if (isShow) return '上映'
       return '下映'
     },
-    reverseShow(isShow) {
-      if (isShow) return '下映'
-      return '上映'
-    },
     scoreFilter(score) {
       if (score == null) {
         return '暂无'
@@ -188,6 +259,14 @@ export default {
     },
   },
   data() {
+    const validatePrice = (rule, value, callback) => {
+      const regex = /^\d+(\.\d{1,2})?$/
+      if (!regex.test(value)) {
+        callback(new Error('请输入xx.xx格式'))
+      } else {
+        callback()
+      }
+    }
     return {
       languages: [
         {
@@ -225,6 +304,7 @@ export default {
           label: '上映',
         },
       ],
+      movieListOptions: [],
       movieList: null,
       total: 0,
       listLoading: true,
@@ -235,6 +315,29 @@ export default {
         page: 1,
         limit: 20,
       },
+      addDialogVisible: false,
+      addMovieForm: {
+        movieId: undefined,
+        price: 0,
+      },
+      addMovieFormRules: {
+        movieId: [{ required: true, message: '请输入电影名', trigger: 'blur' }],
+        price: [
+          { required: true, message: '请输入票价', trigger: 'blur' },
+          { validator: validatePrice, trigger: 'blur' },
+        ],
+      },
+      editDialogVisible: false,
+      editMovieForm: {
+        id: '',
+        price: 0,
+      },
+      editMovieFormRules: {
+        price: [
+          { required: true, message: '请输入票价', trigger: 'blur' },
+          { validator: validatePrice, trigger: 'blur' },
+        ],
+      },
     }
   },
   created() {
@@ -243,30 +346,80 @@ export default {
   methods: {
     getMovieList() {
       this.listLoading = true
-      if (this.listQuery.name !== '')
+      if (this.listQuery.name != null && this.listQuery.name !== '')
         this.listQuery.name = this.listQuery.name.trim()
-      fetchMovieList(this.listQuery).then((response) => {
+      fetchMovieListByStore(this.listQuery).then((response) => {
         this.movieList = response.data.list
         this.total = response.data.total
         this.listLoading = false
       })
     },
-    async movieStateChanged(row) {
-      const confirmResult = await this.$confirm('确定上映/下映?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).catch((err) => err)
+    addMovieByStore() {
+      this.$refs.addMovieFormRef.validate(async (valid) => {
+        if (!valid) return
+        addMovieByStore(this.addMovieForm)
+          .then((response) => {
+            this.$message.success('添加电影成功')
+            this.addDialogVisible = false
+						this.addMovieForm.movieId = undefined
+						this.addMovieForm.price = 0
+            this.getMovieList()
+          })
+          .catch((err) => {
+            this.$message.error('添加电影失败')
+            this.addDialogVisible = false
+          })
+      })
+    },
+    showEditDialog(row) {
+      this.editMovieForm.id = row.id
+      this.editMovieForm.price = row.price
+      this.editDialogVisible = true
+    },
+    editMovieByStore() {
+      this.$refs.editMovieFormRef.validate(async (valid) => {
+        if (!valid) return
+        editMovieByStore(this.editMovieForm)
+          .then((response) => {
+            this.$message.success('更新票价成功')
+            this.editDialogVisible = false
+            this.getMovieList()
+          })
+          .catch((err) => {
+            this.$message.error('更新票价失败')
+            this.editDialogVisible = false
+          })
+      })
+    },
+    async removeMovieByStore(id) {
+      const confirmResult = await this.$confirm(
+        '此操作将永久删除该电影, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      ).catch((err) => err)
+      // 点击确定 返回值为：confirm
+      // 点击取消 返回值为： cancel
       if (confirmResult !== 'confirm') {
-        return this.$message.info('已取消')
+        return this.$message.info('已取消删除')
       }
-      movieStateChanged({ movieId: row.id, isShow: !row.isShow })
+      removeMovieByStore({ id: id })
         .then((response) => {
+          this.$message.success('删除电影成功')
           this.getMovieList()
         })
         .catch((err) => {
-          row.isShow = !row.isShow
+          this.$message.success('删除电影成功')
         })
+    },
+    getRemoteMovieList(query) {
+      fetchMovieByStore({ name: query }).then((response) => {
+        if (!response.data) return
+        this.movieListOptions = response.data
+      })
     },
   },
 }
