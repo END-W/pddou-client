@@ -265,7 +265,6 @@ export default {
           this.getMovieList()
         })
         .catch((err) => {
-          row.isShow = !row.isShow
         })
     },
   },

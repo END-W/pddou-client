@@ -171,6 +171,54 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/hall',
+    component: Layout,
+    redirect: '/hall/index',
+    alwaysShow: true,
+    name: 'Hall',
+    meta: {
+      title: '影厅管理',
+      icon: 'hall',
+      roles: ['STORE', 'STAFF'],
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/hall/index'),
+        name: 'HallListByStore',
+        meta: {
+          title: '影厅列表',
+          icon: 'list',
+        },
+      },
+    ],
+  },
+
+  {
+    path: '/comment',
+    component: Layout,
+    redirect: '/comment/index',
+    alwaysShow: true,
+    name: 'Comment',
+    meta: {
+      title: '评论管理',
+      icon: 'comment',
+      roles: ['SUPERADMIN', 'ADMIN'],
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/comment/index'),
+        name: 'CommentList',
+        meta: {
+          title: '评论列表',
+          icon: 'list',
+        },
+      },
+    ],
+  },
+
+  {
     path: '/nested',
     component: Layout,
     redirect: '/nested/menu1',

@@ -145,18 +145,20 @@
         <template slot-scope="scope">
           <el-button
             type="primary"
-            size="small"
+            icon="el-icon-edit"
+            size="mini"
+            circle
             @click="showEditDialog(scope.row)"
           >
-            编辑
           </el-button>
           <el-button
             type="danger"
+            icon="el-icon-delete"
             size="mini"
+            circle
             style="margin-right: 10px"
             @click="removeMovieByStore(scope.row.id)"
           >
-            删除
           </el-button>
         </template>
       </el-table-column>
@@ -170,22 +172,23 @@
       @pagination="getMovieList"
     />
 
-    <el-dialog title="添加电影" :visible.sync="addDialogVisible" width="30%">
+    <el-dialog title="添加电影" :visible.sync="addDialogVisible" width="25%">
       <el-form
         :model="addMovieForm"
         ref="addMovieFormRef"
         :rules="addMovieFormRules"
         label-width="100px"
       >
-        <el-form-item label="电影名" prop="movieId">
+        <el-form-item label-width="70px" label="电影名" prop="movieId">
           <el-select
             v-model="addMovieForm.movieId"
             filterable
             remote
             reserve-keyword
-						clearable
+            clearable
             placeholder="请输入电影名"
             :remote-method="getRemoteMovieList"
+            style="width: 100%"
           >
             <el-option
               v-for="item in movieListOptions"
@@ -196,11 +199,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="票价" prop="price">
-          <el-input
-            style="width: 202px"
-            v-model="addMovieForm.price"
-          ></el-input>
+        <el-form-item label-width="70px" label="票价" prop="price">
+          <el-input v-model="addMovieForm.price"></el-input>
         </el-form-item>
       </el-form>
 
@@ -210,7 +210,7 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="修改票价" :visible.sync="editDialogVisible" width="30%">
+    <el-dialog title="修改票价" :visible.sync="editDialogVisible" width="25%">
       <el-form
         :model="editMovieForm"
         ref="editMovieFormRef"
@@ -361,8 +361,8 @@ export default {
           .then((response) => {
             this.$message.success('添加电影成功')
             this.addDialogVisible = false
-						this.addMovieForm.movieId = undefined
-						this.addMovieForm.price = 0
+            this.addMovieForm.movieId = undefined
+            this.addMovieForm.price = 0
             this.getMovieList()
           })
           .catch((err) => {
