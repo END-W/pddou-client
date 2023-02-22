@@ -8,6 +8,14 @@ export function fetchCommentList(query) {
   })
 }
 
+export function removeComment(query) {
+  return request({
+    url: '/admin/comment/delete',
+    method: 'delete',
+    params: query
+  })
+}
+
 export function commentStateChanged(data) {
   return request({
     url: '/admin/comment/changeStatus',

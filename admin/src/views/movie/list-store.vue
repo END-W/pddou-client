@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" :model="listQuery" class="demo-form-inline">
-      <el-row>
-        <el-col :span="6">
+      <el-row :gutter="20">
+        <el-col :span="4">
           <el-form-item>
             <el-input
               placeholder="请输入电影名"
@@ -14,7 +14,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item>
             <el-select
               v-model="listQuery.language"
@@ -33,7 +33,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item>
             <el-select
               v-model="listQuery.isShow"
@@ -141,24 +141,28 @@
         </template>
       </el-table-column>
 
-      <el-table-column min-width="160px" fixed="right" label="操作">
+      <el-table-column min-width="140px" fixed="right" label="操作">
         <template slot-scope="scope">
           <el-button
-            type="primary"
-            icon="el-icon-edit"
+            type="danger"
             size="mini"
-            circle
+            @click="movieByStoreStateChanged(scope.row)"
+          >
+            {{ scope.row.isShow | reverseShow }}
+          </el-button>
+          <el-button
+            type="primary"
+            size="mini"
             @click="showEditDialog(scope.row)"
           >
+            编辑
           </el-button>
           <el-button
             type="danger"
-            icon="el-icon-delete"
             size="mini"
-            circle
-            style="margin-right: 10px"
             @click="removeMovieByStore(scope.row.id)"
           >
+            删除
           </el-button>
         </template>
       </el-table-column>
@@ -236,6 +240,7 @@ import {
   addMovieByStore,
   editMovieByStore,
   removeMovieByStore,
+  movieByStoreStateChanged
 } from '@/api/movie'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -250,6 +255,10 @@ export default {
     parseShow(isShow) {
       if (isShow) return '上映'
       return '下映'
+    },
+    reverseShow(isShow) {
+      if (isShow) return '下映'
+      return '上映'
     },
     scoreFilter(score) {
       if (score == null) {
@@ -412,7 +421,26 @@ export default {
           this.getMovieList()
         })
         .catch((err) => {
-          this.$message.success('删除电影成功')
+          this.$message.error('删除电影失败')
+        })
+    },
+    async movieByStoreStateChanged(row) {
+      const confirmResult = await this.$confirm('确定上映/下映?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).catch((err) => err)
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消')
+      }
+      let tempShow = ['上映', '下映']
+      movieByStoreStateChanged({ id: row.id, isShow: !row.isShow })
+        .then((response) => {
+          this.$message.success(tempShow[row.isShow ? 1 : 0] + '成功')
+          this.getMovieList()
+        })
+        .catch((err) => {
+          this.$message.error(tempShow[row.isShow ? 1 : 0] + '失败')
         })
     },
     getRemoteMovieList(query) {

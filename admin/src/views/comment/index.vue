@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" :model="listQuery" class="demo-form-inline">
-      <el-row>
-        <el-col :span="6">
+      <el-row :gutter="20">
+        <el-col :span="4">
           <el-form-item>
             <el-input
               placeholder="请输入用户名"
@@ -14,7 +14,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item>
             <el-input
               placeholder="请输入电影名"
@@ -26,7 +26,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item>
             <el-select
               v-model="listQuery.isPass"
@@ -45,7 +45,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item>
             <el-button type="primary" @click="getCommentList">查询</el-button>
           </el-form-item>
@@ -82,7 +82,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="140px" align="center" label="评论时间">
+      <el-table-column width="160px" align="center" label="评论时间">
         <template slot-scope="scope">
           <span>{{ scope.row.commentDate }}</span>
         </template>
@@ -113,10 +113,16 @@
           <el-button
             type="danger"
             size="mini"
-            style="margin-right: 10px"
             @click="commentStateChanged(scope.row)"
           >
-            {{ scope.row.isPass | reversePass }}
+            审核
+          </el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            @click="removeComment(scope.row.id)"
+          >
+            删除
           </el-button>
         </template>
       </el-table-column>
@@ -133,7 +139,7 @@
 </template>
 
 <script>
-import { fetchCommentList, commentStateChanged } from '@/api/comment'
+import { fetchCommentList, removeComment, commentStateChanged } from '@/api/comment'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -147,10 +153,6 @@ export default {
     parsePass(isPass) {
       if (isPass) return '通过'
       return '未通过'
-    },
-    reversePass(isPass) {
-      if (isPass) return '未通过'
-      return '通过'
     },
   },
   data() {
@@ -193,8 +195,31 @@ export default {
         this.listLoading = false
       })
     },
+    async removeComment(id) {
+      const confirmResult = await this.$confirm(
+        '此操作将永久删除该评论, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      ).catch((err) => err)
+      // 点击确定 返回值为：confirm
+      // 点击取消 返回值为： cancel
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消删除')
+      }
+      removeComment({commentId: id}).then(response => {
+        this.$message.success('删除评论成功')
+        this.getCommentList()
+      }).catch(err => {
+        this.$message.error('删除评论失败')
+      })
+    },
     async commentStateChanged(row) {
-      const confirmResult = await this.$confirm('确定通过/不通过?', '提示', {
+      let pass = ['通过', '不通过']
+      const confirmResult = await this.$confirm(pass[row.isPass ? 1: 0] + '?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -204,9 +229,11 @@ export default {
       }
       commentStateChanged({ commentId: row.id, isPass: !row.isPass })
         .then((response) => {
+          this.$message.success('审核成功')
           this.getCommentList()
         })
         .catch((err) => {
+          this.$message.error('审核失败')
         })
     },
   },

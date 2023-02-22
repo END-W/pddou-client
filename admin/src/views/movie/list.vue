@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" :model="listQuery" class="demo-form-inline">
-      <el-row>
-        <el-col :span="6">
+      <el-row :gutter="20">
+        <el-col :span="4">
           <el-form-item>
             <el-input
               placeholder="请输入电影名"
@@ -14,7 +14,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item>
             <el-select
               v-model="listQuery.language"
@@ -33,7 +33,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item>
             <el-select
               v-model="listQuery.isShow"
@@ -52,7 +52,7 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
+        <el-col :span="4">
           <el-form-item>
             <el-button type="primary" @click="getMovieList">查询</el-button>
           </el-form-item>
@@ -260,11 +260,14 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('已取消')
       }
+      let tempShow = ['上映', '下映']
       movieStateChanged({ movieId: row.id, isShow: !row.isShow })
         .then((response) => {
+          this.$message.success(tempShow[row.isShow ? 1 : 0] + '成功')
           this.getMovieList()
         })
         .catch((err) => {
+          this.$message.error(tempShow[row.isShow ? 1 : 0] + '失败')
         })
     },
   },

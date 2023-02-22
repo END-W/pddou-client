@@ -99,7 +99,7 @@ export const asyncRoutes = [
     meta: {
       title: '员工管理',
       icon: 'employee',
-      roles: ['SUPERADMIN', 'ADMIN', 'STORE'],
+      roles: ['ADMIN', 'STORE'],
     },
     children: [
       {
@@ -219,74 +219,48 @@ export const asyncRoutes = [
   },
 
   {
-    path: '/nested',
+    path: '/order',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
+    redirect: '/order/index',
+    alwaysShow: true,
+    name: 'Order',
     meta: {
-      title: 'Nested',
-      icon: 'nested',
+      title: '订单管理',
+      icon: 'order',
+      roles: ['SUPERADMIN', 'ADMIN', 'STORE', 'STAFF'],
     },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
+        path: 'index',
+        component: () => import('@/views/order/index'),
+        name: 'OrderList',
         meta: {
-          title: 'Menu1',
+          title: '订单列表',
+          icon: 'list',
         },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: {
-              title: 'Menu1-1',
-            },
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: {
-              title: 'Menu1-2',
-            },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () =>
-                  import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: {
-                  title: 'Menu1-2-1',
-                },
-              },
-              {
-                path: 'menu1-2-2',
-                component: () =>
-                  import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: {
-                  title: 'Menu1-2-2',
-                },
-              },
-            ],
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: {
-              title: 'Menu1-3',
-            },
-          },
-        ],
       },
+    ],
+  },
+
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/index',
+    alwaysShow: true,
+    name: 'System',
+    meta: {
+      title: '系统设置',
+      icon: 'system',
+      roles: ['SUPERADMIN'],
+    },
+    children: [
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
+        path: 'index',
+        component: () => import('@/views/employee/index'),
+        name: 'EmployeeList',
         meta: {
-          title: 'menu2',
+          title: '员工列表',
+          icon: 'list',
         },
       },
     ],

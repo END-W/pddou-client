@@ -79,3 +79,11 @@ export function movieStateChanged(data) {
     data
   })
 }
+
+export function movieByStoreStateChanged(data) {
+  return request({
+    url: '/admin/movie/storeChangeStatus',
+    method: 'post',
+    data
+  })
+}
