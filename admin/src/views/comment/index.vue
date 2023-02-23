@@ -140,6 +140,7 @@
 
 <script>
 import { fetchCommentList, removeComment, commentStateChanged } from '@/api/comment'
+import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -189,7 +190,7 @@ export default {
         this.listQuery.username = this.listQuery.username.trim()
       if (this.listQuery.movieName !== '')
         this.listQuery.movieName = this.listQuery.movieName.trim()
-      fetchCommentList(this.listQuery).then((response) => {
+      fetchCommentList(filterEmpty(this.listQuery)).then((response) => {
         this.commentList = response.data.list
         this.total = response.data.total
         this.listLoading = false

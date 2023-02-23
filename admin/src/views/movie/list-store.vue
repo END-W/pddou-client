@@ -242,6 +242,7 @@ import {
   removeMovieByStore,
   movieByStoreStateChanged
 } from '@/api/movie'
+import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -357,7 +358,7 @@ export default {
       this.listLoading = true
       if (this.listQuery.name != null && this.listQuery.name !== '')
         this.listQuery.name = this.listQuery.name.trim()
-      fetchMovieListByStore(this.listQuery).then((response) => {
+      fetchMovieListByStore(filterEmpty(this.listQuery)).then((response) => {
         this.movieList = response.data.list
         this.total = response.data.total
         this.listLoading = false

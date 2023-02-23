@@ -162,6 +162,7 @@
 
 <script>
 import { fetchMovieList, movieStateChanged } from '@/api/movie'
+import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -245,7 +246,7 @@ export default {
       this.listLoading = true
       if (this.listQuery.name !== '')
         this.listQuery.name = this.listQuery.name.trim()
-      fetchMovieList(this.listQuery).then((response) => {
+      fetchMovieList(filterEmpty(this.listQuery)).then((response) => {
         this.movieList = response.data.list
         this.total = response.data.total
         this.listLoading = false

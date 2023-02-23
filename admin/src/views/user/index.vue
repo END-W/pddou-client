@@ -111,7 +111,8 @@ import {
   fetchUserList,
   removeUser,
   userStateChanged,
-} from '@/api/user.js'
+} from '@/api/user'
+import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -155,7 +156,7 @@ export default {
       this.listLoading = true
       if (this.listQuery.username !== '') this.listQuery.username = this.listQuery.username.trim()
       if (this.listQuery.phone !== '') this.listQuery.phone = this.listQuery.phone.trim()
-      fetchUserList(this.listQuery).then((response) => {
+      fetchUserList(filterEmpty(this.listQuery)).then((response) => {
         this.userList = response.data.list
         this.total = response.data.total
         this.listLoading = false

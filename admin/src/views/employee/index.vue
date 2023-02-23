@@ -246,7 +246,8 @@ import {
   editEmployee,
   removeEmployee,
   employeeStateChanged,
-} from '@/api/employee.js'
+} from '@/api/employee'
+import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import md5 from 'js-md5'
 import { validEmail, validPhone } from '@/utils/validate'
@@ -381,7 +382,7 @@ export default {
       this.listLoading = true
       if (this.listQuery.username !== '') this.listQuery.username = this.listQuery.username.trim()
       if (this.listQuery.phone !== '') this.listQuery.phone = this.listQuery.phone.trim()
-      fetchEmployeeList(this.listQuery).then((response) => {
+      fetchEmployeeList(filterEmpty(this.listQuery)).then((response) => {
         this.employeeList = response.data.list
         this.total = response.data.total
         this.listLoading = false

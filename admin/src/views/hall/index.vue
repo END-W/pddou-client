@@ -121,6 +121,7 @@ import {
   editHallByStore,
   removeHallByStore,
 } from '@/api/hall'
+import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -161,7 +162,7 @@ export default {
       this.listLoading = true
       if (this.listQuery.name != null && this.listQuery.name !== '')
         this.listQuery.name = this.listQuery.name.trim()
-      fetchHallListByStore(this.listQuery).then((response) => {
+      fetchHallListByStore(filterEmpty(this.listQuery)).then((response) => {
         this.hallList = response.data.list
         this.total = response.data.total
         this.listLoading = false

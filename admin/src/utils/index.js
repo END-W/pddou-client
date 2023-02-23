@@ -115,3 +115,13 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+export function filterEmpty(obj) {
+  let tempObj = JSON.parse(JSON.stringify(obj))
+  for (let key in tempObj) {
+    if (tempObj[key] === '' || tempObj[key] === null || tempObj[key] === undefined) {
+      delete tempObj[key]
+    }
+  }
+  return tempObj
+}
