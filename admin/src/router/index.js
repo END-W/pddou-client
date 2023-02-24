@@ -195,6 +195,30 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/schedule',
+    component: Layout,
+    redirect: '/schedule/index',
+    alwaysShow: true,
+    name: 'Schedule',
+    meta: {
+      title: '场次管理',
+      icon: 'schedule',
+      roles: ['STORE', 'STAFF'],
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/schedule/index'),
+        name: 'ScheduleListByStore',
+        meta: {
+          title: '场次列表',
+          icon: 'list',
+        },
+      },
+    ],
+  },
+
+  {
     path: '/comment',
     component: Layout,
     redirect: '/comment/index',

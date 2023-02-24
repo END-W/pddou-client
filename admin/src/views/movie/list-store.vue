@@ -123,7 +123,7 @@
 
       <el-table-column width="100px" align="center" label="票价">
         <template slot-scope="scope">
-          <span>{{ scope.row.price }}</span>
+          <span>{{ scope.row.price | parseFloat }}</span>
         </template>
       </el-table-column>
 
@@ -266,6 +266,9 @@ export default {
         return '暂无'
       }
       return score
+    },
+    parseFloat(price) {
+      return parseFloat(price).toFixed(2)
     },
   },
   data() {

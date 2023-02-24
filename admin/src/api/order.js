@@ -15,11 +15,3 @@ export function removeOrderByStore(query) {
     params: query
   })
 }
-
-export function returnTicketById(data) {
-  return request({
-    url: '/admin/order/returnTicket',
-    method: 'post',
-    data
-  })
-}

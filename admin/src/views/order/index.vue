@@ -90,13 +90,13 @@
       <el-table-column type="index" width="60px" align="center" label="ID">
       </el-table-column>
 
-      <el-table-column width="140px" align="center" label="用户名">
+      <el-table-column min-width="140px" align="center" label="用户名">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="200px" align="center" label="电影名">
+      <el-table-column min-width="200px" align="center" label="电影名">
         <template slot-scope="scope">
           <span>{{ scope.row.movieName }}</span>
         </template>
@@ -104,7 +104,7 @@
 
       <el-table-column
         v-if="'SUPERADMIN' === roles[0] || 'ADMIN' === roles[0]"
-        width="200px"
+        min-width="200px"
         align="center"
         label="影院"
       >
@@ -113,7 +113,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="140px" align="center" label="影厅">
+      <el-table-column width="160px" align="center" label="影厅">
         <template slot-scope="scope">
           <span>{{ scope.row.hallName }}</span>
         </template>
@@ -131,7 +131,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column min-width="80px" align="center" label="票数">
+      <el-table-column width="80px" align="center" label="票数">
         <template slot-scope="scope">
           <span>{{ scope.row.ticketNum }}</span>
         </template>
@@ -157,26 +157,20 @@
         </template>
       </el-table-column>
 
-      <el-table-column min-width="160px" fixed="right" label="操作">
+      <el-table-column
+        v-if="'STORE' === roles[0] || 'STAFF' === roles[0]"
+        min-width="160px"
+        fixed="right"
+        label="操作"
+      >
         <template slot-scope="scope">
           <el-button
-            v-if="
-              ('STORE' === roles[0] || 'STAFF' === roles[0]) &&
-              ('PAID' === scope.row.payType || 'FAILED' === scope.row.payType)
-            "
+            v-if="'NO_PAID' !== scope.row.payType"
             type="danger"
             size="mini"
             @click.stop.prevent="removeOrderByStore(scope.row.id)"
           >
             删除
-          </el-button>
-          <el-button
-            v-if="isReturn(scope.row)"
-            type="danger"
-            size="mini"
-            @click.stop.prevent="returnTicket(scope.row.id)"
-          >
-            退票
           </el-button>
         </template>
       </el-table-column>
@@ -194,11 +188,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import {
-  fetchOrderList,
-  removeOrderByStore,
-  returnTicketById,
-} from '@/api/order'
+import { fetchOrderList, removeOrderByStore } from '@/api/order'
 import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -226,7 +216,7 @@ export default {
     },
     parseFloat(price) {
       return parseFloat(price).toFixed(2)
-    }
+    },
   },
   data() {
     return {
@@ -270,20 +260,6 @@ export default {
     this.getOrdertList()
   },
   methods: {
-    isReturn(row) {
-      if ('SUPERADMIN' === this.roles[0] || 'ADMIN' === this.roles[0]) {
-        if (row.payType !== 'RETURN') {
-          let time = row.showDate + ' ' + row.showTime
-          let now = new Date().getTime() + 10 * 60
-          let after = new Date(time).getTime()
-          if (now >= after) {
-            return false
-          }
-          return true
-        }
-        return false
-      }
-    },
     getOrdertList() {
       this.listLoading = true
       if (this.listQuery.username !== '')
@@ -323,24 +299,6 @@ export default {
         })
         .catch((err) => {
           this.$message.error('删除订单失败')
-        })
-    },
-    async returnTicket(id) {
-      const confirmResult = await this.$confirm('确定退票，是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).catch((err) => err)
-      if (confirmResult !== 'confirm') {
-        return this.$message.info('已取消')
-      }
-      returnTicketById({ orderId: id })
-        .then((response) => {
-          this.$message.success('退票成功')
-          this.getOrdertList()
-        })
-        .catch((err) => {
-          this.$message.error('退票失败')
         })
     },
   },
