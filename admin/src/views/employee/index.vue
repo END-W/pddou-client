@@ -81,7 +81,7 @@
       >
         <template slot-scope="{ row }">
           <el-tag :type="row.type | typeFilter">
-            {{ row.type }}
+            {{ row.type | parseType }}
           </el-tag>
         </template>
       </el-table-column>
@@ -95,7 +95,7 @@
       >
         <template slot-scope="{ row }">
           <el-tag :type="row.userType | userTypeFilter">
-            {{ row.userType }}
+            {{ row.userType | parseUserType }}
           </el-tag>
         </template>
       </el-table-column>
@@ -278,6 +278,21 @@ export default {
         STAFF: 'info'
       }
       return statusMap[status]
+    },
+    parseType(type) {
+      const typeMap = {
+        ADMINISTRATION: '平台',
+        MERCHANT: '商家'
+      }
+      return typeMap[type]
+    },
+    parseUserType(userType) {
+      const userTypeMap = {
+        ADMIN: '管理员',
+        STORE: '商家',
+        STAFF: '员工'
+      }
+      return userTypeMap[userType]
     }
   },
   data() {
@@ -447,7 +462,7 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('已取消删除')
       }
-      removeEmployee({ employeeId: id }).then((response) => {
+      removeEmployee({ employeeId: id, userType: this.roles[0] }).then((response) => {
         this.$message.success('删除员工成功')
         this.getEmployeeList()
       }).catch((err) => {

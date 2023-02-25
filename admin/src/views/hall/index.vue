@@ -74,7 +74,7 @@
       :total="total"
       :page.sync="listQuery.page"
       :limit.sync="listQuery.limit"
-      @pagination="getMovieList"
+      @pagination="getHallList"
     />
 
     <el-dialog title="添加影厅" :visible.sync="addDialogVisible" width="25%">

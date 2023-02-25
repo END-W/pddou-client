@@ -171,6 +171,30 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/cinema',
+    component: Layout,
+    redirect: '/cinema/index',
+    alwaysShow: true,
+    name: 'Cinema',
+    meta: {
+      title: '影院管理',
+      icon: 'cinema',
+      roles: ['SUPERADMIN', 'ADMIN'],
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/cinema/index'),
+        name: 'CinemaList',
+        meta: {
+          title: '影院列表',
+          icon: 'list',
+        },
+      },
+    ],
+  },
+
+  {
     path: '/hall',
     component: Layout,
     redirect: '/hall/index',

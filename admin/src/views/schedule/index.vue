@@ -184,6 +184,7 @@
             clearable
             type="date"
             placeholder="选择日期"
+            :picker-options="datePickerOptions"
             format="yyyy 年 MM 月 dd 日"
             value-format="yyyy-MM-dd"
             style="width: 100%"
@@ -197,7 +198,7 @@
             :picker-options="{
               start: '00:00',
               step: '00:05',
-              end: '24:00',
+              end: '23:55',
             }"
             placeholder="选择时间"
             style="width: 100%"
@@ -303,6 +304,9 @@ export default {
           { required: true, message: '请输入放映时间', trigger: 'blur' },
         ],
       },
+      datePickerOptions: {
+        disabledDate: this.disabledDate,
+      },
     }
   },
   created() {
@@ -310,6 +314,17 @@ export default {
     this.getHallList()
   },
   methods: {
+    disabledDate(time) {
+      if (this.addScheduleForm.movieId) {
+        if (new Date(this.addScheduleForm.publicDate) - new Date() > 0) {
+          return time.getTime() < new Date(this.addScheduleForm.publicDate)
+        } else {
+          return time.getTime() < new Date()
+        }
+      } else {
+        return time.getTime() > 0
+      }
+    },
     getScheduletList() {
       this.listLoading = true
       if (this.listQuery.movieName !== '')
@@ -373,9 +388,8 @@ export default {
         })
     },
     changeMovie(id) {
-      this.movieListOptions.forEach(v => {
-        if (v.id === id)
-          this.addScheduleForm.publicDate = v.publicDate
+      this.movieListOptions.forEach((v) => {
+        if (v.id === id) this.addScheduleForm.publicDate = v.publicDate
       })
     },
     getRemoteScheduleList(query) {
