@@ -57,14 +57,6 @@
             <el-button type="primary" @click="getCinematList">查询</el-button>
           </el-form-item>
         </el-col>
-
-        <el-col :span="4">
-          <el-form-item>
-            <el-button type="primary" @click="addDialogVisible = true"
-              >添加</el-button
-            >
-          </el-form-item>
-        </el-col>
       </el-row>
     </el-form>
 
@@ -145,6 +137,9 @@
 
       <el-table-column min-width="160px" fixed="right" label="操作">
         <template slot-scope="scope">
+          <router-link :to="'/cinema/edit/' + scope.row.id">
+            <el-button type="primary" size="mini" style="margin-right: 10px"> 编辑 </el-button>
+          </router-link>
           <el-button
             v-if="'ON_ACTIVITY' !== scope.row.isExamine"
             type="danger"
@@ -181,7 +176,10 @@
         label-width="100px"
       >
         <el-form-item label-width="70px" label="审核" prop="isExamine">
-          <el-select v-model="examineForm.isExamine" placeholder="请选择审核状态">
+          <el-select
+            v-model="examineForm.isExamine"
+            placeholder="请选择审核状态"
+          >
             <el-option
               v-for="item in examineOptions"
               :key="item.value"
@@ -198,30 +196,11 @@
         <el-button type="primary" @click="examineCinema">确 定</el-button>
       </span>
     </el-dialog>
-
-    <el-dialog title="添加场次" :visible.sync="addDialogVisible" width="25%">
-      <el-form
-        :model="addScheduleForm"
-        ref="addScheduleFormRef"
-        :rules="addScheduleFormRules"
-        label-width="100px"
-      >
-      </el-form>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="addDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addScheduleByStore">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import {
-  fetchCinemaList,
-  examineCinema,
-  blockCinema
-} from '@/api/cinema'
+import { fetchCinemaList, examineCinema, blockCinema } from '@/api/cinema'
 import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -233,7 +212,7 @@ export default {
       const examineMap = {
         HAVING_APPLY: 'warning',
         FAIL: 'danger',
-        ON_ACTIVITY: 'success'
+        ON_ACTIVITY: 'success',
       }
       return examineMap[isExamine]
     },
@@ -241,14 +220,14 @@ export default {
       const examineMap = {
         HAVING_APPLY: '审核中',
         FAIL: '失败',
-        ON_ACTIVITY: '通过'
+        ON_ACTIVITY: '通过',
       }
       return examineMap[isExamine]
     },
     isBlockFilter(isBlock) {
       const blockMap = {
         YES: 'danger',
-        NO: 'success'
+        NO: 'success',
       }
       if (isBlock) {
         return blockMap['YES']
@@ -258,7 +237,7 @@ export default {
     parseIsBlock(isBlock) {
       const blockMap = {
         YES: '是',
-        NO: '否'
+        NO: '否',
       }
       if (isBlock) {
         return blockMap['YES']
@@ -266,17 +245,17 @@ export default {
       return blockMap['NO']
     },
     parseCheckPerson(checkPerson) {
-      if (checkPerson === null || checkPerson  === '') {
+      if (checkPerson === null || checkPerson === '') {
         return '暂无'
       }
       return checkPerson
     },
     parseCheckTime(checkTime) {
-      if (checkTime === null || checkTime  === '') {
+      if (checkTime === null || checkTime === '') {
         return '暂无'
       }
       return checkTime
-    }
+    },
   },
   data() {
     return {
@@ -314,6 +293,7 @@ export default {
           label: '失败',
         },
       ],
+      map: null,
       cinemaList: null,
       total: 0,
       listLoading: true,
@@ -327,29 +307,11 @@ export default {
       examineDialogVisible: false,
       examineForm: {
         id: undefined,
-        isExamine: ''
+        isExamine: '',
       },
       examineFormRules: {
-        isExamine: [{ required: true, message: '请选择审核状态', trigger: 'blur' }]
-      },
-      addDialogVisible: false,
-      addScheduleForm: {
-        movieId: undefined,
-        hallName: '',
-        publicDate: '',
-        showDate: '',
-        showTime: '',
-      },
-      addScheduleFormRules: {
-        movieId: [{ required: true, message: '请输入电影名', trigger: 'blur' }],
-        hallName: [
-          { required: true, message: '请输入影厅名', trigger: 'blur' },
-        ],
-        showDate: [
-          { required: true, message: '请输入放映日期', trigger: 'blur' },
-        ],
-        showTime: [
-          { required: true, message: '请输入放映时间', trigger: 'blur' },
+        isExamine: [
+          { required: true, message: '请选择审核状态', trigger: 'blur' },
         ],
       },
       datePickerOptions: {
@@ -371,26 +333,6 @@ export default {
         this.listLoading = false
       })
     },
-    addScheduleByStore() {
-      this.$refs.addScheduleFormRef.validate(async (valid) => {
-        if (!valid) return
-        addScheduleByStore(this.addScheduleForm)
-          .then((response) => {
-            this.$message.success('添加场次成功')
-            this.addDialogVisible = false
-            this.addScheduleForm.movieId = undefined
-            this.addScheduleForm.hallName = ''
-            this.addScheduleForm.publicDate = ''
-            this.addScheduleForm.showDate = ''
-            this.addScheduleForm.showTime = ''
-            this.getScheduletList()
-          })
-          .catch((err) => {
-            this.$message.error('添加场次失败')
-            this.addDialogVisible = false
-          })
-      })
-    },
     showExamine(id) {
       this.examineForm.id = id
       this.examineDialogVisible = true
@@ -398,13 +340,15 @@ export default {
     examineCinema() {
       this.$refs.examineFormRef.validate(async (valid) => {
         if (!valid) return
-        examineCinema(this.examineForm).then(response => {
-          this.examineDialogVisible = false
-          this.$message.success('审核成功')
-          this.getCinematList()
-        }).catch(err => {
-          this.$message.error('审核失败')
-        })
+        examineCinema(this.examineForm)
+          .then((response) => {
+            this.examineDialogVisible = false
+            this.$message.success('审核成功')
+            this.getCinematList()
+          })
+          .catch((err) => {
+            this.$message.error('审核失败')
+          })
       })
     },
     async blockCinema(id) {
@@ -422,13 +366,15 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('已取消删除')
       }
-      blockCinema({cinemaId: id}).then(response => {
-        this.$message.success('拉黑影院成功')
-        this.getCinematList()
-      }).catch(err => {
-        this.$message.error('拉黑影院失败')
-      })
-    }
+      blockCinema({ cinemaId: id })
+        .then((response) => {
+          this.$message.success('拉黑影院成功')
+          this.getCinematList()
+        })
+        .catch((err) => {
+          this.$message.error('拉黑影院失败')
+        })
+    },
   },
 }
 </script>

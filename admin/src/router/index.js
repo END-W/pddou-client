@@ -173,7 +173,7 @@ export const asyncRoutes = [
   {
     path: '/cinema',
     component: Layout,
-    redirect: '/cinema/index',
+    redirect: '/cinema/list',
     alwaysShow: true,
     name: 'Cinema',
     meta: {
@@ -183,8 +183,28 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/cinema/index'),
+        path: 'create',
+        component: () => import('@/views/cinema/create'),
+        name: 'CreateCinema',
+        meta: {
+          title: '添加影院',
+          icon: 'edit',
+        },
+      },
+      {
+        path: 'edit/:id(\\d+)',
+        component: () => import('@/views/cinema/edit'),
+        name: 'EditCinema',
+        meta: {
+          title: '编辑影院',
+          noCache: true,
+          activeMenu: '/cinema/list',
+        },
+        hidden: true,
+      },
+      {
+        path: 'list',
+        component: () => import('@/views/cinema/list'),
         name: 'CinemaList',
         meta: {
           title: '影院列表',
