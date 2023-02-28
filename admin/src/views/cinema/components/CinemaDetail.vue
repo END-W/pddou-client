@@ -40,21 +40,6 @@
               <el-row>
                 <el-col :span="6">
                   <el-form-item
-                    prop="legalPerson"
-                    label-width="100px"
-                    label="法定代表人:"
-                    class="postInfo-container-item"
-                    style="width: 90%"
-                  >
-                    <el-input
-                      v-model="postForm.legalPerson"
-                      placeholder="请输入内容"
-                    ></el-input>
-                  </el-form-item>
-                </el-col>
-
-                <el-col :span="6">
-                  <el-form-item
                     prop="cinemaPhone"
                     label-width="90px"
                     label="影院电话:"
@@ -64,6 +49,38 @@
                     <el-input
                       v-model="postForm.cinemaPhone"
                       placeholder="请输入内容"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+
+                <el-col :span="6">
+                  <el-form-item
+                    prop="legalPerson"
+                    label-width="100px"
+                    label="法定代表人:"
+                    class="postInfo-container-item"
+                    style="width: 90%"
+                  >
+                    <el-input
+                      v-model="postForm.legalPerson"
+                      placeholder="请输入内容"
+                      :disabled="isEdit"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+
+                <el-col :span="6">
+                  <el-form-item
+                    prop="phone"
+                    label-width="90px"
+                    label="联系电话:"
+                    class="postInfo-container-item"
+                    style="width: 90%"
+                  >
+                    <el-input
+                      v-model="postForm.phone"
+                      placeholder="请输入内容"
+                      :disabled="isEdit"
                     ></el-input>
                   </el-form-item>
                 </el-col>
@@ -81,9 +98,10 @@
               label="详细地址:"
             >
               <el-input
+                id="tipinput"
                 placeholder="请输入内容"
                 v-model="postForm.specifiedAddress"
-                @input="search"
+                @keyup.stop.enter="search"
               >
               </el-input>
             </el-form-item>
@@ -92,16 +110,6 @@
       </div>
     </el-form>
     <div class="main">
-      <div class="form">
-        <!-- 搜索框 -->
-        <input
-          id="tipinput"
-          class="input"
-          type="text"
-          v-model="postForm.specifiedAddress"
-          @input="search"
-        />
-      </div>
       <!-- 查询列表，高德地图api绑定id -->
       <div class="list" id="list"></div>
       <!-- 地图，需设置宽高 -->
@@ -115,6 +123,7 @@ import Sticky from '@/components/Sticky' // 粘性header组件
 import { fetchCinema, addCinema, editCinema } from '@/api/cinema'
 import AMapLoader from '@amap/amap-jsapi-loader'
 import { getLocation, placeSearch } from '@/utils/map'
+import { validPhone } from '@/utils/validate'
 
 // 设置安全密钥
 window._AMapSecurityConfig = {
@@ -124,12 +133,13 @@ window._AMapSecurityConfig = {
 const defaultForm = {
   cinemaName: '', // 影院名
   cinemaPhone: '', // 影院电话
-  province: '', // 省份
-  city: '', // 城市
+  province: null, // 省份
+  city: null, // 城市
   specifiedAddress: '', // 详细地址
   legalPerson: '', // 法定代表人
-  lng: null, // 经度
-  lat: null, // 纬度
+  phone: '',
+  lng: 103.982045, // 经度
+  lat: 30.715903, // 纬度
   id: undefined,
 }
 
@@ -143,6 +153,20 @@ export default {
     },
   },
   data() {
+    const validatePhone = (rule, value, callback) => {
+      if (!validPhone(value)) {
+        callback(new Error('请输入正确的手机格式'))
+      } else {
+        callback()
+      }
+    }
+    const validateTelPhone = (rule, value, callback) => {
+      if (!/^0\d{2,3}-\d{7,8}$/.test(value)) {
+        callback(new Error('请输入格式如:010-22222222'))
+      } else {
+        callback()
+      }
+    }
     return {
       postForm: Object.assign({}, defaultForm),
       loading: false,
@@ -152,12 +176,17 @@ export default {
         ],
         cinemaPhone: [
           { required: true, message: '请输入影院电话', trigger: 'blur' },
+          { validator: validateTelPhone, trigger: 'blur' },
         ],
         specifiedAddress: [
           { required: true, message: '请输入详情地址', trigger: 'blur' },
         ],
         legalPerson: [
           { required: true, message: '请输入法定代表人', trigger: 'blur' },
+        ],
+        phone: [
+          { required: true, message: '请输入联系电话', trigger: 'blur' },
+          { validator: validatePhone, trigger: 'blur' },
         ],
       },
       status: 'draft',
@@ -174,8 +203,6 @@ export default {
     if (this.isEdit) {
       const id = this.$route.params && this.$route.params.id
       this.fetchData(id)
-    } else {
-      this.loadAMap()
     }
   },
   methods: {
@@ -194,6 +221,9 @@ export default {
       })
         .then((AMap) => {
           this.AMap = AMap
+          if (!this.isEdit) {
+            this.loadAMap()
+          }
         })
         .catch((e) => {
           console.log('高德地图加载错误', e)
@@ -206,15 +236,17 @@ export default {
         zoom: 13, // 初始化地图级别
         resizeEnable: true,
       })
+      getLocation(AMap, this.map, this.isEdit)
       this.geocoder = new AMap.Geocoder()
       let auto = new AMap.AutoComplete({
         input: 'tipinput',
       })
-      getLocation(AMap, this.map, this.isEdit)
       this.placeSearch = placeSearch(AMap, this.map)
+      // 注册监听，当选中某条记录时会触发
+      auto.on('select', this.select)
       if (this.isEdit) {
         this.map.clearMap()
-        var marker = new AMap.Marker({
+        let marker = new AMap.Marker({
           map: this.map,
           position: options,
         })
@@ -225,25 +257,25 @@ export default {
           anchor: 'top-center',
           content: '标记点',
         })
-        console.log(this.map.getCenter())
         infoWindow.open(this.map, options)
       }
     },
+    select(e) {
+      this.placeSearch.setCity(e.poi.adcode)
+      // 关键字查询查询
+      this.placeSearch.search(e.poi.name)
+    },
     search() {
       if (!this.postForm.specifiedAddress) return
-      this.placeSearch.search(
-        this.postForm.specifiedAddress,
-        (status, result) => {
-          console.log(result)
-        }
-      )
+      this.placeSearch.search(this.postForm.specifiedAddress)
     },
     getAddress() {
       let cc = this.map.getCenter()
       return new Promise((resolve, reject) => {
         this.geocoder.getAddress([cc.lng, cc.lat], (status, result) => {
-          if (result.regeocode.formattedAddress) {
-            resolve(result.regeocode.formattedAddress)
+          console.log(result)
+          if (result.info === 'OK') {
+            resolve(result)
           } else {
             resolve('')
           }
@@ -270,47 +302,50 @@ export default {
     submitForm() {
       console.log(this.postForm)
       this.getAddress().then((result) => {
-        console.log(result)
-      })
-      return
-      this.$refs.postForm.validate((valid) => {
-        if (valid && this.status !== 'published') {
-          this.loading = true
-          if (this.postForm.id == undefined) {
-            addCinema(this.postForm)
-              .then((response) => {
-                this.$notify({
-                  title: '成功',
-                  message: '添加电影成功',
-                  type: 'success',
-                  duration: 2000,
+        let cc = this.map.getCenter()
+        // this.postForm.lng = cc.lng
+        // this.postForm.lat = cc.lat
+        this.postForm.province = result.regeocode.addressComponent.province
+        this.postForm.city = result.regeocode.addressComponent.city
+        this.$refs.postForm.validate((valid) => {
+          if (valid && this.status !== 'published') {
+            this.loading = true
+            if (this.postForm.id == undefined) {
+              addCinema(this.postForm)
+                .then((response) => {
+                  this.$notify({
+                    title: '成功',
+                    message: '添加影院成功',
+                    type: 'success',
+                    duration: 2000,
+                  })
+                  this.status = 'published'
+                  this.loading = false
                 })
-                this.status = 'published'
-                this.loading = false
-              })
-              .catch((err) => {
-                this.loading = false
-              })
+                .catch((err) => {
+                  this.loading = false
+                })
+            } else {
+              editCinema(this.postForm)
+                .then((response) => {
+                  this.$notify({
+                    title: '成功',
+                    message: '编辑影院成功',
+                    type: 'success',
+                    duration: 2000,
+                  })
+                  this.status = 'published'
+                  this.loading = false
+                })
+                .catch((err) => {
+                  this.loading = false
+                })
+            }
           } else {
-            editCinema(this.postForm)
-              .then((response) => {
-                this.$notify({
-                  title: '成功',
-                  message: '编辑电影成功',
-                  type: 'success',
-                  duration: 2000,
-                })
-                this.status = 'published'
-                this.loading = false
-              })
-              .catch((err) => {
-                this.loading = false
-              })
+            console.log('error submit!!')
+            return false
           }
-        } else {
-          console.log('error submit!!')
-          return false
-        }
+        })
       })
     },
   },
@@ -360,30 +395,14 @@ export default {
     height: 100%;
   }
 
-  .form {
-    position: absolute;
-    left: 10px;
-    top: 10px;
-    z-index: 999;
-
-    .input {
-      width: 240px;
-      line-height: 30px;
-      padding-left: 5px;
-      box-shadow: 0 2px 6px 0 rgb(114 124 245 / 50%);
-      outline: none;
-      border-radius: 5px;
-      border: none;
-    }
-  }
-
   .list {
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 20px;
     height: 300px;
-    width: 220px;
+    width: 240px;
     z-index: 999;
+    overflow-y: auto;
 
     .li {
       line-height: 25px;

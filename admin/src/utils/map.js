@@ -16,7 +16,6 @@ export function getLocation(AMap, map, isEdit) {
     // 获取精确位置
     geolocation.getCurrentPosition(function (status, result) {
       if (status == 'complete') {
-        console.log(result)
         // 经度
         let lng = result.position.lng
         // 纬度

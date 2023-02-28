@@ -159,7 +159,7 @@
         <el-form-item label="姓名" prop="name">
           <el-input v-model="addEmployeeForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item label="邮箱">
           <el-input v-model="addEmployeeForm.email"></el-input>
         </el-form-item>
         <el-form-item label="手机" prop="phone">
@@ -209,7 +209,7 @@
         <el-form-item label="姓名" prop="name">
           <el-input v-model="editEmployeeForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item label="邮箱">
           <el-input v-model="editEmployeeForm.email"></el-input>
         </el-form-item>
         <el-form-item label="手机" prop="phone">
