@@ -101,7 +101,7 @@
                 id="tipinput"
                 placeholder="请输入内容"
                 v-model="postForm.specifiedAddress"
-                @keyup.stop.enter="search"
+                @keyup.enter.native="search"
               >
               </el-input>
             </el-form-item>
@@ -138,8 +138,8 @@ const defaultForm = {
   specifiedAddress: '', // 详细地址
   legalPerson: '', // 法定代表人
   phone: '',
-  lng: 103.982045, // 经度
-  lat: 30.715903, // 纬度
+  lng: null, // 经度
+  lat: null, // 纬度
   id: undefined,
 }
 
@@ -194,6 +194,7 @@ export default {
       map: null,
       placeSearch: null,
       geocoder: null,
+      pois: [],
     }
   },
   mounted() {
@@ -230,28 +231,28 @@ export default {
         })
     },
     loadAMap(options) {
-      this.map = new AMap.Map('container', {
+      this.map = new this.AMap.Map('container', {
         center: options,
         viewMode: '3D', //  是否为3D地图模式
         zoom: 13, // 初始化地图级别
         resizeEnable: true,
       })
-      getLocation(AMap, this.map, this.isEdit)
-      this.geocoder = new AMap.Geocoder()
-      let auto = new AMap.AutoComplete({
-        input: 'tipinput',
-      })
-      this.placeSearch = placeSearch(AMap, this.map)
+      getLocation(this.AMap, this.map, this.isEdit)
+      this.geocoder = new this.AMap.Geocoder()
+      // let auto = new AMap.AutoComplete({
+      //   input: 'tipinput',
+      // })
+      this.placeSearch = placeSearch(this.AMap, this.map)
       // 注册监听，当选中某条记录时会触发
-      auto.on('select', this.select)
+      // auto.on('select', this.select)
       if (this.isEdit) {
         this.map.clearMap()
-        let marker = new AMap.Marker({
+        let marker = new this.AMap.Marker({
           map: this.map,
           position: options,
         })
         // 设置地图层级
-        this.map.setZoom(14)
+        this.map.setZoom(15)
         // 构建自定义信息窗体
         let infoWindow = new this.AMap.InfoWindow({
           anchor: 'top-center',
@@ -267,20 +268,42 @@ export default {
     },
     search() {
       if (!this.postForm.specifiedAddress) return
-      this.placeSearch.search(this.postForm.specifiedAddress)
-    },
-    getAddress() {
-      let cc = this.map.getCenter()
-      return new Promise((resolve, reject) => {
-        this.geocoder.getAddress([cc.lng, cc.lat], (status, result) => {
+      this.placeSearch.search(
+        this.postForm.specifiedAddress,
+        (status, result) => {
           console.log(result)
+          this.pois = result.poiList.pois
           if (result.info === 'OK') {
-            resolve(result)
-          } else {
-            resolve('')
+            let lis = document.querySelectorAll('#list li')
+            for (let i = 0; i < lis.length; i++) {
+              let that = this
+              console.log(that.postForm)
+              lis[i].onclick = function () {
+                let j = i
+                that.getAddress(j)
+              }
+            }
           }
-        })
-      })
+        }
+      )
+    },
+    getAddress(i) {
+      let data = this.pois[i]
+      this.postForm.province = data.pname
+      this.postForm.city = data.cityname
+      this.postForm.specifiedAddress = data.adname + data.address
+      this.postForm.lng = data.location.lng
+      this.postForm.lat = data.location.lat
+      // let cc = this.map.getCenter()
+      // return new Promise((resolve, reject) => {
+      //   this.geocoder.getAddress([cc.lng, cc.lat], (status, result) => {
+      //     if (result.info === 'OK') {
+      //       resolve(result)
+      //     } else {
+      //       resolve('')
+      //     }
+      //   })
+      // })
     },
     fetchData(id) {
       fetchCinema({ cinemaId: id })
@@ -300,32 +323,34 @@ export default {
       document.title = `${title} - ${this.postForm.id}`
     },
     submitForm() {
-      console.log(this.postForm)
-      this.getAddress().then((result) => {
-        let cc = this.map.getCenter()
-        // this.postForm.lng = cc.lng
-        // this.postForm.lat = cc.lat
-        this.postForm.province = result.regeocode.addressComponent.province
-        this.postForm.city = result.regeocode.addressComponent.city
-        this.$refs.postForm.validate((valid) => {
-          if (valid && this.status !== 'published') {
-            this.loading = true
-            if (this.postForm.id == undefined) {
-              addCinema(this.postForm)
-                .then((response) => {
-                  this.$notify({
-                    title: '成功',
-                    message: '添加影院成功',
-                    type: 'success',
-                    duration: 2000,
-                  })
-                  this.status = 'published'
-                  this.loading = false
+      this.$refs.postForm.validate((valid) => {
+        if (valid && this.status !== 'published') {
+          this.postForm.cinemaName = this.postForm.cinemaName.trim()
+          this.postForm.cinemaPhone = this.postForm.cinemaPhone.trim()
+          this.postForm.legalPerson = this.postForm.legalPerson.trim()
+          this.postForm.phone = this.postForm.phone.trim()
+          this.loading = true
+          console.log(this.postForm)
+          if (this.postForm.id == undefined) {
+            addCinema(this.postForm)
+              .then((response) => {
+                this.$notify({
+                  title: '成功',
+                  message: '添加影院成功',
+                  type: 'success',
+                  duration: 2000,
                 })
-                .catch((err) => {
-                  this.loading = false
-                })
-            } else {
+                this.status = 'published'
+                this.loading = false
+              })
+              .catch((err) => {
+                this.loading = false
+              })
+          } else {
+            let cc = this.map.getCenter()
+            if (
+              !(cc.lng === this.postForm.lng && cc.lat === this.postForm.lat)
+            ) {
               editCinema(this.postForm)
                 .then((response) => {
                   this.$notify({
@@ -340,12 +365,14 @@ export default {
                 .catch((err) => {
                   this.loading = false
                 })
+            } else {
+              this.loading = false
             }
-          } else {
-            console.log('error submit!!')
-            return false
           }
-        })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
     },
   },
