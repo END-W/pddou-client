@@ -3,8 +3,8 @@
     <el-row :gutter="20">
       <el-col :span="6">
         <el-input
-          placeholder="请输入用户名"
           v-model="listQuery.username"
+          placeholder="请输入用户名"
           clearable
           @clear="getUserList"
         >
@@ -12,8 +12,8 @@
       </el-col>
       <el-col :span="6">
         <el-input
-          placeholder="请输入手机号码"
           v-model="listQuery.phone"
+          placeholder="请输入手机号码"
           clearable
           @clear="getUserList"
         >
@@ -82,7 +82,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column v-if="'SUPERADMIN' === roles[0]" width="140px" label="操作">
+      <el-table-column
+        v-if="'SUPERADMIN' === roles[0]"
+        width="140px"
+        label="操作"
+      >
         <template slot-scope="scope">
           <el-button
             type="danger"
@@ -107,11 +111,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import {
-  fetchUserList,
-  removeUser,
-  userStateChanged,
-} from '@/api/user'
+import { fetchUserList, removeUser, userStateChanged } from '@/api/user'
 import { filterEmpty } from '@/utils/index'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
@@ -120,17 +120,17 @@ export default {
   components: { Pagination },
   filters: {
     parseBirthday(birthday) {
-        if (birthday == null || birthday === '') {
-            return '暂无'
-        }
-        return birthday
+      if (birthday == null || birthday === '') {
+        return '暂无'
+      }
+      return birthday
     },
     parseSign(sign) {
-        if (sign == null || sign === '') {
-            return '暂无'
-        }
-        return sign
-    }
+      if (sign == null || sign === '') {
+        return '暂无'
+      }
+      return sign
+    },
   },
   data() {
     return {
@@ -141,12 +141,12 @@ export default {
         username: '',
         phone: '',
         page: 1,
-        limit: 20
-      }
+        limit: 20,
+      },
     }
   },
   computed: {
-    ...mapGetters(['roles'])
+    ...mapGetters(['roles']),
   },
   created() {
     this.getUserList()
@@ -154,8 +154,10 @@ export default {
   methods: {
     getUserList() {
       this.listLoading = true
-      if (this.listQuery.username !== '') this.listQuery.username = this.listQuery.username.trim()
-      if (this.listQuery.phone !== '') this.listQuery.phone = this.listQuery.phone.trim()
+      if (this.listQuery.username !== '')
+        this.listQuery.username = this.listQuery.username.trim()
+      if (this.listQuery.phone !== '')
+        this.listQuery.phone = this.listQuery.phone.trim()
       fetchUserList(filterEmpty(this.listQuery)).then((response) => {
         this.userList = response.data.list
         this.total = response.data.total
@@ -176,7 +178,7 @@ export default {
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
         }
       ).catch((err) => err)
       // 点击确定 返回值为：confirm
@@ -184,16 +186,17 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('已取消删除')
       }
-      removeUser({ userId: id }).then((response) => {
-        this.$message.success('删除用户成功')
-        this.getUserList()
-      }).catch((err) => {
-        this.$message.success('删除用户失败')
-      })
-    }
-  }
+      removeUser({ userId: id })
+        .then((response) => {
+          this.$message.success('删除用户成功')
+          this.getUserList()
+        })
+        .catch((err) => {
+          this.$message.success('删除用户失败')
+        })
+    },
+  },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
