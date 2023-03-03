@@ -107,7 +107,7 @@
     import {Indicator} from 'mint-ui'
     import {Rate} from  'element-ui'
     import moment from 'moment';
-import { formatDate } from '../../common/util/util';
+import { formatDate } from '../../common/utils/util';
     Vue.use(Rate)
     export default {
         name: "MovieDetail",

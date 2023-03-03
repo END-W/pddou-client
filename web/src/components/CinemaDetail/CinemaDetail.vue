@@ -66,7 +66,7 @@
     import {Indicator} from 'mint-ui';
     import {Carousel,CarouselItem} from 'element-ui'
     import LyTab from 'ly-tab'
-    import { formatDate } from '../../common/util/util';
+    import { formatDate } from '../../common/utils/util';
     Vue.use(Carousel);
     Vue.use(CarouselItem);
     Vue.use(LyTab);

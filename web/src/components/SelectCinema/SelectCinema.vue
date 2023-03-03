@@ -29,7 +29,7 @@
 
 <script>
     import {getMovieDetail,getCurrentMovieSchedule} from '../../api/index'
-    import {formatDate} from '../../common/util/util'
+    import {formatDate} from '../../common/utils/util'
     import {Indicator} from 'mint-ui'
     import Vue from 'vue'
     import LyTab from 'ly-tab'

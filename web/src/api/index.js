@@ -1,4 +1,4 @@
-import ajax from './ajax'
+import ajax from '../common/utils/ajax'
 
 
 //获取验证码
