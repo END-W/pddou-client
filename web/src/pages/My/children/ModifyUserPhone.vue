@@ -1,14 +1,14 @@
 <template>
-  <div id="modify_username">
+  <div id="modify_userphone">
     <div class="top">
       <span class="icon-back" @click="$router.go(-1)"></span>
-      <span class="name ellipsis">修改昵称</span>
-      <span class="sure-btn" @click="modifyUserName">确定</span>
+      <span class="name ellipsis">修改手机号</span>
+      <span class="sure-btn" @click="modifyUserPhone">确定</span>
     </div>
     <div class="container">
-      <el-input class="input" placeholder="3-12个字符支持中英文、数字" v-model="input" spellcheck="false" clearable>
+      <el-input class="input" v-model="input" spellcheck="false" clearable>
       </el-input>
-      <p>添加昵称，获得更多关注</p>
+      <p>改手机号仅用于生成订单</p>
     </div>
   </div>
 </template>
@@ -16,10 +16,12 @@
 <script>
 import { Input } from 'element-ui'
 import { Toast } from 'mint-ui'
+import { validPhone } from '@/common/utils/validate'
 import { getToken } from '@/common/utils/auth'
-import { updateUserName } from '@/api/user'
+import { updateUserPhone } from '@/api/user'
+
 export default {
-  name: 'ModifyUserName',
+  name: 'ModifyUserPhone',
   components: {
     Input
   },
@@ -29,37 +31,20 @@ export default {
     }
   },
   created() {
-    this.input = this.$route.params.username
+    this.input = this.$route.params.phone
   },
   methods: {
-    modifyUserName() {
-      if (!this.input) {
-        Toast({
-          message: '用户名不能为空！',
-          position: 'middle',
-          duration: 2000
+    modifyUserPhone() {
+      if (getToken() && validPhone(this.input)) {
+        updateUserPhone({ phone: this.input }).then(response => {
+          this.$router.go(-1)
         })
-        return
-      } else if (!/^[a-zA-Z\u4e00-\u9fa5][0-9a-zA-Z\u4e00-\u9fa5]*$/.test(this.input)) {
-        Toast({
-          message: '用户名应为中文或字母开头！',
-          position: 'middle',
-          duration: 2000
-        })
-        return
-      } else if (!/^[a-zA-Z\u4e00-\u9fa5]{1}[0-9a-zA-Z\u4e00-\u9fa5]{2,11}$/.test(this.input)) {
-        Toast({
-          message: '用户名应为3到12个字符！',
-          position: 'middle',
-          duration: 2000
-        })
-        return
       } else {
-        if (getToken()) {
-          updateUserName({username: this.input}).then(response => {
-            this.$router.go(-1)
-          })
-        }
+        Toast({
+          message: '手机格式错误',
+          position: 'middle',
+          duration: 2000
+        })
       }
     }
   }
@@ -67,7 +52,7 @@ export default {
 </script>
 
 <style scoped lang="stylus" ref="stylesheet/stylus">
-#modify_username {
+#modify_userphone {
   width: 100%;
   height: 100%;
   font-size: 0.3125rem;

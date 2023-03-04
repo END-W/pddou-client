@@ -66,6 +66,7 @@ import { getPhoneCode, phoneLogin, pwdLogin } from '@/api/user'
 import { validPhone } from '@/common/utils/validate'
 import { setToken } from '@/common/utils/auth'
 import { Toast, MessageBox, Indicator } from 'mint-ui'
+
 export default {
   name: 'Login',
   data() {

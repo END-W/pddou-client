@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 
-const Login = () => import('@/pages/login/Login');
+const Login = () => import('@/pages/login/index');
 import Home from '@/pages/Home/Home'
 import SearchAll from '@/pages/Home/children/SearchAll'
 import Movie from '@/pages/Movie/Movie'
@@ -16,12 +16,12 @@ import SelectCinema from '@/components/SelectCinema/SelectCinema'
 import SelectSeat from '@/components/SelectSeat/SelectSeat'
 import SubmitOrder from '@/components/SubmitOrder/SubmitOrder'
 import Pay from '@/components/Pay/Pay'
-import My from '@/pages/My/My'
-import MyInfo from '@/pages/My/children/MyInfo'
-import MyOrder from '@/pages/My/children/MyOrder'
-import MyMovie from '@/pages/My/children/MyMovie'
-import ModifyUserName from '@/pages/My/children/ModifyUserName'
-import ModifyUserSign from '@/pages/My/children/ModifyUserSign'
+import My from '@/pages/my/index'
+import MyInfo from '@/pages/my/children/MyInfo'
+import MyOrder from '@/pages/my/children/MyOrder'
+import MyMovie from '@/pages/my/children/MyMovie'
+import ModifyUserName from '@/pages/my/children/ModifyUserName'
+import ModifyUserPhone from '@/pages/my/children/ModifyUserPhone'
 
 Vue.use(Router);
 
@@ -83,9 +83,9 @@ export default new Router({
       component: ModifyUserName
     },
     {
-      path: '/modify_usersign',
-      name: 'modify_usersign',
-      component: ModifyUserSign
+      path: '/modify_userphone',
+      name: 'modify_userphone',
+      component: ModifyUserPhone
     },
     {
       path: '/search_all',

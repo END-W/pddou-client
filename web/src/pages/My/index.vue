@@ -15,17 +15,18 @@
     <div class="content">
       <div class="list">
         <div class="item" @click="viewMyOrder">我的订单 <span class="icon-more"></span></div>
-        <div class="item" @click="viewMyMovie(1)">想看的电影 <span class="icon-more"></span></div>
-        <div class="item" @click="viewMyMovie(0)">看过的电影 <span class="icon-more"></span></div>
+        <div class="item" @click="viewMyMovie(0)">想看的电影 <span class="icon-more"></span></div>
+        <div class="item" @click="viewMyMovie(1)">看过的电影 <span class="icon-more"></span></div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { Indicator } from 'mint-ui'
 import { getUserInfo } from '@/api/user'
 import { getToken } from '@/common/utils/auth'
-import { Indicator } from 'mint-ui'
+
 export default {
   name: 'My',
   data() {
@@ -46,7 +47,7 @@ export default {
     },
     // 加载用户信息
     loadUserInfo() {
-      if (getToken()) {
+      if (getToken() && !this.userInfo.name) {
         Indicator.open('Loading...')
         getUserInfo()
           .then(response => {
@@ -58,7 +59,6 @@ export default {
             Indicator.close()
           })
       } else {
-        this.userInfo = {}
         Indicator.close()
       }
     },
@@ -71,7 +71,7 @@ export default {
     // 查看个人订单
     viewMyOrder(flag) {
       if (getToken()) {
-        this.$router.push({ path: 'my_order', query: { user_id: this.$cookies.get('user_id') } })
+        this.$router.push('my_order')
       } else {
         this.$router.push('login')
       }
@@ -79,7 +79,7 @@ export default {
     // 查看个人电影
     viewMyMovie(flag) {
       if (getToken()) {
-        this.$router.push({ path: 'my_movie', query: { user_id: this.$cookies.get('user_id'), wish_movie: flag } })
+        this.$router.push({ path: 'my_movie', isWatched: flag })
       } else {
         this.$router.push('login')
       }

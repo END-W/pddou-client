@@ -6,10 +6,10 @@ import router from './router'
 import cookies from 'vue-cookies'
 import '@/common/icons' // icon
 // 配置字体图标
-import "@/common/css/style.css";
-Vue.config.productionTip = false;
+import "@/common/css/style.css"
+Vue.config.productionTip = false
 
-Vue.use(cookies);
+Vue.use(cookies)
 
 /* eslint-disable no-new */
 new Vue({
@@ -19,5 +19,5 @@ new Vue({
   template: '<App/>'
 });
 router.afterEach((to,from,next) => {
-  window.scrollTo(0,0);
-});
+  window.scrollTo(0,0)
+})

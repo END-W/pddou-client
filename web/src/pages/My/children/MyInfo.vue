@@ -31,35 +31,35 @@
 
         <div
           class="item"
-          @click.prevent="$router.push({name:'modify_username',params:{userName:userName}})"
+          @click.prevent="$router.push({name: 'modify_username',params:{username: username}})"
         >
           <span>昵称</span>
           <span class="right">
-            {{userName?userName:'未填写'}}
+            {{ username ? username: '未填写' }}
             <i class="icon-more"></i>
           </span>
         </div>
-        <div class="item" @click.prevent="showSexPanel=true">
+        <div class="item" @click.prevent="showGenderPanel = true">
           <span>性别</span>
           <span class="right">
-            {{userSex?userSex:'未填写'}}
+            {{ gender ? gender: '未填写' }}
             <i class="icon-more"></i>
           </span>
         </div>
-        <div class="item" @click="showDatePicker=true">
+        <div class="item" @click.prevent="showDatePicker = true">
           <span>生日</span>
           <span class="right">
-            {{birthday}}
+            {{ birthday }}
             <i class="icon-more"></i>
           </span>
         </div>
         <div
           class="item sign"
-          @click.prevent="$router.push({name:'modify_usersign',params:{sign:sign}})"
+          @click.prevent="$router.push({name:'modify_userphone',params:{phone: phone}})"
         >
-          <span>个人签名</span>
+          <span>订单手机号</span>
           <span class="right">
-            <span class="ellipsis sign">{{sign?sign:'未填写'}}</span>
+            <span class="ellipsis sign">{{ phone }}</span>
             <i class="icon-more"></i>
           </span>
         </div>
@@ -68,14 +68,14 @@
         <span class="logout-btn" @click="logout()">退出</span>
       </div>
     </div>
-    <div class="modify_sex" v-show="showSexPanel" @click="showSexPanel=false">
+    <div class="modify_sex" v-show="showGenderPanel" @click="showGenderPanel = false">
       <div class="container" @click.stop>
         <div class="content">
           <div class="title">修改性别</div>
-          <div class="item" @click="modifyUserSex('男')">
+          <div class="item" @click="modifyUserGender('男')">
             <i class="icon-male"></i>男
           </div>
-          <div class="item" @click="modifyUserSex('女')">
+          <div class="item" @click="modifyUserGender('女')">
             <i class="icon-female"></i>女
           </div>
         </div>
@@ -91,149 +91,120 @@
 </template>
 
 <script>
-import Vue from "vue";
-import { MessageBox, Indicator, Toast } from "mint-ui";
-import moment from "moment";
-import { Input } from "element-ui";
-import DatePicker from "vuejs-mobile-datepicker";
-// import DatePicker from '../../../components/DatePicker/DatePicker' //引入日期选择器组件
-Vue.use(Input);
-import {
-  getUserInfo,
-  updateUserInfo,
-  updateUserSex,
-  updateUserBirthday,
-  upLoadImg,
-  updateUserAvatar
-} from "../../../api/index";
+import Vue from "vue"
+import { MessageBox, Indicator, Toast } from "mint-ui"
+import { Input } from "element-ui"
+import DatePicker from "vuejs-mobile-datepicker"
+import { getUserInfo, updateUserGender, updateUserBirthday, upLoadImg } from '@/api/user'
+import { getToken, removeToken } from '@/common/utils/auth'
+
+Vue.use(Input)
+
 export default {
   name: "MyInfo",
   data() {
     return {
-      userName: "",
-      userPwd: "",
-      userSex: "",
+      username: "",
+      password: "",
+      gender: "",
       avatar: "",
       avatarSrc: "",
       birthday: null,
-      sign: "",
-      jsonData: {},
+      phone: "",
+      userInfo: {},
       showDatePicker: false,
-      showSexPanel: false
+      showGenderPanel: false
     };
   },
   components: {
     DatePicker
   },
   created() {
-    Indicator.open("Loading...");
-    this.loadUserInfo();
+    Indicator.open('Loading...')
+    this.loadUserInfo()
   },
   methods: {
-    //更新用户信息
-    updateUserInfo() {
-      if (this.jsonData) {
-        this.avatarSrc = this.jsonData.avatar;
-        this.avatar = "http://localhost:3000" + this.avatarSrc;
-        this.jsonData.user_name
-          ? (this.userName = this.jsonData.user_name)
-          : (this.userName = "");
-        this.jsonData.password
-          ? (this.userPwd = this.jsonData.password)
-          : (this.userPwd = "");
-        this.jsonData.sex
-          ? (this.userSex = this.jsonData.sex)
-          : (this.userSex = "");
-        this.jsonData.birthday
-          ? (this.birthday = this.jsonData.birthday)
-          : (this.birthday = null);
-        this.jsonData.sign
-          ? (this.sign = this.jsonData.sign)
-          : (this.sign = "");
+    // 加载用户信息
+    loadUserInfo() {
+      if (getToken()) {
+        getUserInfo()
+          .then(response => {
+            this.userInfo = response.data
+            this.updateUserInfo()
+            Indicator.close()
+          })
+          .catch(err => {
+            Indicator.close()
+          })
       }
     },
-    async modifyUserSex(sex) {
-      if (this.$cookies.get("user_id") && sex) {
-        let json = await updateUserSex(this.$cookies.get("user_id"), sex);
-        if (json.success_code == 200) {
-          this.showSexPanel = false;
-          this.userSex = sex;
-        }
+    // 更新用户信息
+    updateUserInfo() {
+      if (this.userInfo) {
+        this.avatarSrc = this.userInfo.avatar
+        this.avatar = this.avatarSrc
+        this.userInfo.username
+          ? (this.username = this.userInfo.username)
+          : (this.username = "")
+        this.userInfo.gender
+          ? (this.gender = this.userInfo.gender)
+          : (this.gender = "")
+        this.userInfo.birthday
+          ? (this.birthday = this.userInfo.birthday)
+          : (this.birthday = null)
+        this.phone = this.userInfo.phone
+      }
+    },
+    async modifyUserGender(gender) {
+      if (getToken() && gender) {
+        updateUserGender({gender: gender}).then(response => {
+          this.showGenderPanel = false
+          this.gender = gender
+        })
       }
     },
     changeImg(e) {
-      let reader = new FileReader();
-      reader.readAsDataURL(this.$refs.uploadImg.files[0]); //发起异步请求
-      let _this = this;
+      let reader = new FileReader()
+      reader.readAsDataURL(this.$refs.uploadImg.files[0]) // 发起异步请求
+      let _this = this
       reader.onload = function() {
-        //读取完成后，将结果赋值给img的src
-        _this.modifyUserAvatar();
-        _this.$refs.previewImg.src = this.result;
-      };
+        // 读取完成后，将结果赋值给img的src
+        _this.modifyUserAvatar()
+        _this.$refs.previewImg.src = this.result
+      }
     },
-    //修改用户头像
+    // 修改用户头像
     async modifyUserAvatar() {
-      if (!this.$cookies.get("user_id")) {
-        Message.error("请先登录！");
-        return false;
+      if (!getToken()) {
+        Toast({
+          message: "请先登录！",
+          position: "middle",
+          duration: 2000
+        })
+        return false
       } else {
-        let formData = new FormData();
-        formData.append("file", this.$refs.uploadImg.files[0]);
-        let json = await upLoadImg(formData);
-        if (json.success_code === 200) {
-          if (json.data.length) {
-            let userNewAvatar = "/images/avatar/" + json.data[0].filename;
-            json = await updateUserAvatar(
-              this.$cookies.get("user_id"),
-              userNewAvatar
-            );
-            if (json.success_code == 200) {
-              Toast({
-                message: "修改头像成功",
-                position: "middle",
-                duration: 2000
-              });
-            }else{
-              Toast({
-                message: json.message,
-                position: "middle",
-                duration: 2000
-              });
-            }
-          }
-        }
+        let formData = new FormData()
+        formData.append("file", this.$refs.uploadImg.files[0])
+        upLoadImg(formData).then(response => {
+          Toast({
+            message: "修改头像成功",
+            position: "middle",
+            duration: 2000
+          })
+        })
       }
     },
-    //加载用户信息
-    async loadUserInfo() {
-      if (this.$cookies.get("user_id")) {
-        let json = await getUserInfo(this.$cookies.get("user_id"));
-        if (json.success_code === 200) {
-          this.jsonData = json.data;
-          this.updateUserInfo();
-        } else {
-          this.jsonData = {};
-        }
-      } else {
-        this.jsonData = {};
-      }
-      Indicator.close();
-    },
-    //取消按钮
+    // 取消按钮
     handleCancel() {
-      this.showDatePicker = false;
+      this.showDatePicker = false
     },
-    //确定按钮
+    // 确定按钮
     async handleConfirm(selectedDate) {
-      if (this.$cookies.get("user_id") && selectedDate) {
-        let json = await updateUserBirthday(
-          this.$cookies.get("user_id"),
-          selectedDate
-        );
-        if (json.success_code == 200) {
-          this.showDatePicker = false;
-          this.birthday = selectedDate;
-        }
+      if (getToken() && selectedDate) {
+        updateUserBirthday({birthday: selectedDate}).then(response => {
+          this.showDatePicker = false
+          this.birthday = selectedDate
+        })
       }
     },
     disableDate(item) {
@@ -241,36 +212,28 @@ export default {
         new Date(item) - new Date("1900-10-10") >= 0 &&
         new Date("1990-10-10") - new Date(item) >= 0
       ) {
-        return true;
+        return true
       }
     },
-    //修改用户名
-    changeUserName() {
-      MessageBox.prompt("修改用户名").then(({ value, action }) => {
-        if (value) {
-          this.userName = value;
-        }
-      });
-    },
-    //修改密码
+    // 修改密码
     changeUserPwd() {
       MessageBox.prompt("修改密码(1-6位)").then(({ value, action }) => {
         if (value && /^[\w_-]{1,6}$/.test(value)) {
-          this.userPwd = value;
+          this.password = value
         } else {
-          MessageBox.alert("请输入1到6位密码！");
+          MessageBox.alert("请输入1到6位密码！")
         }
       });
     },
-    //退出登录
+    // 退出登录
     logout() {
-      if (this.$cookies.get("user_id")) {
-        this.$cookies.remove("user_id");
-        this.$router.push("my");
+      if (getToken()) {
+        removeToken()
+        this.$router.push("my")
       }
     }
   }
-};
+}
 </script>
 
 <style scoped lang="stylus" ref="stylesheet/stylus">
