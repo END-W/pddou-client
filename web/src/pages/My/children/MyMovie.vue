@@ -17,7 +17,7 @@
         </div>
       </div>
       <div v-show="isWatched" class="watched">
-        <div class="item" v-for="(item,index) in isWatchedMovie" :key="index" @click="$router.push({path: 'movie_detail', query: {'movie_id': item.id}})">
+        <div class="item" v-for="(item,index) in isWatchedMovie" :key="index" @click="$router.push({path: 'movie_detail', query: {movieId: item.id}})">
           <img :src="item.poster" alt="">
           <div class="info">
             <div class="name">{{ item.name }}</div>

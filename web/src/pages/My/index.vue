@@ -25,7 +25,7 @@
 <script>
 import { Indicator } from 'mint-ui'
 import { getUserInfo } from '@/api/user'
-import { getToken } from '@/common/utils/auth'
+import { getToken, getCookie, setCookie } from '@/common/utils/auth'
 
 export default {
   name: 'My',
@@ -47,11 +47,12 @@ export default {
     },
     // 加载用户信息
     loadUserInfo() {
-      if (getToken() && !this.userInfo.name) {
+      if (getToken() && !getCookie('userInfo')) {
         Indicator.open('Loading...')
         getUserInfo()
           .then(response => {
             this.userInfo = response.data
+            setCookie('userInfo', response.data, 60 * 60 * 3)
             this.userAvatar()
             Indicator.close()
           })
@@ -59,6 +60,11 @@ export default {
             Indicator.close()
           })
       } else {
+        let userInfo = getCookie('userInfo')
+        if (userInfo) {
+          this.userInfo = userInfo
+          this.avatar = this.userInfo.avatar
+        }
         Indicator.close()
       }
     },
@@ -69,7 +75,7 @@ export default {
       }
     },
     // 查看个人订单
-    viewMyOrder(flag) {
+    viewMyOrder() {
       if (getToken()) {
         this.$router.push('my_order')
       } else {
@@ -79,7 +85,7 @@ export default {
     // 查看个人电影
     viewMyMovie(flag) {
       if (getToken()) {
-        this.$router.push({ path: 'my_movie', isWatched: flag })
+        this.$router.push({ name: 'my_movie', params: {isWatched: flag}})
       } else {
         this.$router.push('login')
       }

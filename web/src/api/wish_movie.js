@@ -11,7 +11,7 @@ export function getWishMovieByUserId() {
 // 获取个人评论的电影
 export function getIsWatchedMovieByUserId() {
   return request({
-    url: '/api/wishMovie/getIsWatchedMovieByUserId',
+    url: '/api/comment/getIsWatchedMovieByUserId',
     method: 'get'
   })
 }

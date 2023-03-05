@@ -5,20 +5,6 @@ import ajax from '../common/utils/ajax'
 export const updateUserInfo = (userId,userName,avatar,password,sex,sign,birthday)=>ajax('/api/updateUserInfo',{userId,userName,avatar,password,sex,sign,birthday},'POST');
 //获取电影列表
 export const getMovieList = ()=>ajax('/api/getMovieList');
-//获取电影详情
-export const getMovieDetail = (movieId)=>ajax('/api/getMovieDetail',{movieId});
-//判断用户是否想看电影
-export const isWishMovie = (userId,movieId)=>ajax('/api/isWishMovie',{userId,movieId},'POST');
-//想看电影
-export const wishMovie = (userId,movieId)=>ajax('/api/wishMovie',{userId,movieId},'POST');
-//取消想看电影
-export const cancelWishMovie = (userId,movieId)=>ajax('/api/cancelWishMovie',{userId,movieId},'POST');
-//获取当前用户评论
-export const getUserComment = (userId,movieId)=>ajax('/api/getUserComment',{userId,movieId});
-//更新当前用户评论
-export const updateUserComment = (userId,movieId,score,commentContent,commentDate)=>ajax('/api/updateUserComment',{userId,movieId,score,commentContent,commentDate},'POST');
-//获取所有用户通过审核的评论
-export const getAllUserPassComment = (movieId)=>ajax('/api/getAllUserPassComment',{movieId});
 //获取当前评论
 export const getCommentById = (commentId)=>ajax('/api/getCommentById',{commentId});
 //更新当前评论的用户点赞

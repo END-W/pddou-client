@@ -31,7 +31,7 @@
 
         <div
           class="item"
-          @click.prevent="$router.push({name: 'modify_username',params:{username: username}})"
+          @click.prevent="$router.push({name: 'modify_username', params:{username: username}})"
         >
           <span>昵称</span>
           <span class="right">
@@ -55,7 +55,7 @@
         </div>
         <div
           class="item sign"
-          @click.prevent="$router.push({name:'modify_userphone',params:{phone: phone}})"
+          @click.prevent="$router.push({name:'modify_userphone', params:{phone: phone}})"
         >
           <span>订单手机号</span>
           <span class="right">
@@ -96,7 +96,7 @@ import { MessageBox, Indicator, Toast } from "mint-ui"
 import { Input } from "element-ui"
 import DatePicker from "vuejs-mobile-datepicker"
 import { getUserInfo, updateUserGender, updateUserBirthday, upLoadImg } from '@/api/user'
-import { getToken, removeToken } from '@/common/utils/auth'
+import { getToken, removeToken, removeCookie } from '@/common/utils/auth'
 
 Vue.use(Input)
 
@@ -160,6 +160,7 @@ export default {
         updateUserGender({gender: gender}).then(response => {
           this.showGenderPanel = false
           this.gender = gender
+          removeCookie('userInfo')
         })
       }
     },
@@ -186,6 +187,7 @@ export default {
         let formData = new FormData()
         formData.append("file", this.$refs.uploadImg.files[0])
         upLoadImg(formData).then(response => {
+          removeCookie('userInfo')
           Toast({
             message: "修改头像成功",
             position: "middle",
@@ -204,6 +206,7 @@ export default {
         updateUserBirthday({birthday: selectedDate}).then(response => {
           this.showDatePicker = false
           this.birthday = selectedDate
+          removeCookie('userInfo')
         })
       }
     },
@@ -229,6 +232,7 @@ export default {
     logout() {
       if (getToken()) {
         removeToken()
+        removeCookie('userInfo')
         this.$router.push("my")
       }
     }

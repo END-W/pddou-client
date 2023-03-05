@@ -16,7 +16,7 @@
 <script>
 import { Input } from 'element-ui'
 import { Toast } from 'mint-ui'
-import { getToken } from '@/common/utils/auth'
+import { getToken, removeCookie } from '@/common/utils/auth'
 import { updateUserName } from '@/api/user'
 export default {
   name: 'ModifyUserName',
@@ -57,6 +57,7 @@ export default {
       } else {
         if (getToken()) {
           updateUserName({username: this.input}).then(response => {
+            removeCookie('userInfo')
             this.$router.go(-1)
           })
         }

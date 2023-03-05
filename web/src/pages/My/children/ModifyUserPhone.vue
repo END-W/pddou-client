@@ -17,7 +17,7 @@
 import { Input } from 'element-ui'
 import { Toast } from 'mint-ui'
 import { validPhone } from '@/common/utils/validate'
-import { getToken } from '@/common/utils/auth'
+import { getToken, removeCookie } from '@/common/utils/auth'
 import { updateUserPhone } from '@/api/user'
 
 export default {
@@ -37,6 +37,7 @@ export default {
     modifyUserPhone() {
       if (getToken() && validPhone(this.input)) {
         updateUserPhone({ phone: this.input }).then(response => {
+          removeCookie('userInfo')
           this.$router.go(-1)
         })
       } else {

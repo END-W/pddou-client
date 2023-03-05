@@ -1,9 +1,9 @@
 <template>
   <div v-if="movieList.length">
     <div class="movie-item" v-for="(item,index) in movieList" :key="index">
-      <img :src="item.poster" alt="" @click="$router.push({path:'/movie_detail', query:{movie_id: item.id}})">
+      <img :src="item.poster" alt="" @click="$router.push({path:'/movie_detail', query:{movieId: item.id}})">
       <div class="info">
-        <div class="name" @click="$router.push({path:'/movie_detail', query:{movie_id: item.id}})" v-html="ruleName(item.name)"></div>
+        <div class="name" @click="$router.push({path:'/movie_detail', query:{movieId: item.id}})" v-html="ruleName(item.name)"></div>
         <div>
           <div class="descInfo" v-if="item.score">评分：<span class="number">{{item.score.toFixed(1)}}</span></div>
           <div class="descInfo" v-else>暂无评分</div>
@@ -19,7 +19,7 @@
         class="buy" 
         v-if="item.isShow" 
         :class="{pre_sell: new Date(item.publicDate) - new Date() > 0}" 
-        @click="$router.push({path: '/select_cinema', query: {movie_id: item.id}})
+        @click="$router.push({path: '/select_cinema', query: {movieId: item.id}})
       ">
         {{ new Date(item.publicDate) - new Date() > 0 ? '预售': '购票' }}
       </span>
