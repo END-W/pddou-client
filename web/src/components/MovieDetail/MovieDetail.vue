@@ -16,7 +16,7 @@
     </div>
     <div class="action">
       <div class="btn" :class="{'active': !notWishMovie}" @click="wishBtnHandle"><span class="icon-like-fill"></span><span class="font">想看</span></div>
-      <div class="btn" @click="watchedBtnHandle"><span class="icon-star-fill"></span><span class="font">看过</span></div>
+      <div class="btn" :class="{'active': isWatched}" @click="watchedBtnHandle"><span class="icon-star-fill"></span><span class="font">看过</span></div>
     </div>
     <div class="public-praise">
       <div class="header">
@@ -61,7 +61,7 @@
               <div class="comment-content">{{ currentUserCommentData[0].content }}</div>
               <div class="bottom">
                 <span class="comment-date">{{ formatCommentDate(currentUserCommentData[0].commentDate) }}</span>
-                <span class="support" :class="{'active': userIsSupportComment(currentUserCommentData[0].supportUser)}" @click="supportBtnHandle(currentUserCommentData[0].id)"><span class="icon-support"></span><span class="number">{{ currentUserCommentData[0].supportNum }}</span></span>
+                <span class="support" :class="{'active': userIsSupportComment(currentUserCommentData[0].supportUser)}" @click="supportBtnHandle(currentUserCommentData[0])"><span class="icon-support"></span><span class="number">{{ currentUserCommentData[0].supportNum === 0 ? '' : currentUserCommentData[0].supportNum }}</span></span>
               </div>
             </div>
           </div>
@@ -76,7 +76,7 @@
               <div class="comment-content">{{ item.content }}</div>
               <div class="bottom">
                 <span class="comment-date">{{ formatCommentDate(item.commentDate) }}</span>
-                <span class="support" :class="{'active': userIsSupportComment(item.supportUser)}" @click="supportBtnHandle(item.id)"><span class="icon-support"></span><span class="number">{{ item.supportNum }}</span></span>
+                <span class="support" :class="{'active': userIsSupportComment(item.supportUser)}" @click="supportBtnHandle(item)"><span class="icon-support"></span><span class="number">{{ item.supportNum === 0 ? '' : item.supportNum }}</span></span>
               </div>
             </div>
           </div>
@@ -84,21 +84,28 @@
         <span class="tips" v-if="!currentUserCommentData.length && !otherUserCommentData.length">暂无评论！</span>
       </div>
     </div>
-    <div class="buy">
-      <div class="btn" @click="$router.push({path: '/select_cinema', query: {movieId: $route.query.movieId}})">特惠购票</div>
+    <div class="buy" v-if="jsonData.isShow">
+      <div 
+        class="btn" 
+        :class="{pre_sell: new Date(jsonData.publicDate) - new Date() > 0}" 
+        @click="$router.push({path: '/select_cinema', query: {movieId: $route.query.movieId}})"
+      >
+        {{ new Date(jsonData.publicDate) - new Date() > 0 ? '预售购票' : '特惠购票' }}
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import {  getCommentById, updateUserSupport } from '../../api/index'
 import Vue from 'vue'
 import { Indicator } from 'mint-ui'
 import { Rate } from 'element-ui'
 import moment from 'moment'
 import { formatDate } from '@/common/utils/util'
 import { getToken, getCookie } from '@/common/utils/auth'
-import { getMovieDetail, isWishMovie, getAllUserPassComment, wishMovie, cancelWishMovie, } from '@/api/movie'
+import { getMovieDetail } from '@/api/movie'
+import { getUserComment, getAllUserPassComment, updateUserSupport } from '@/api/comment'
+import { isWishMovie, wishMovie, cancelWishMovie } from '@/api/wish_movie'
 
 Vue.use(Rate)
 
@@ -112,7 +119,9 @@ export default {
       jsonData: [],
       isShowMovie: false,
       notWishMovie: true,
+      isWatched: false,
       currentUserCommentData: [],
+      tempUserComment: null,
       otherUserCommentData: []
     }
   },
@@ -124,48 +133,54 @@ export default {
     // 加载电影详细信息
     loadMovieDetail() {
       if (this.$route.query.movieId) {
-        getMovieDetail({ movieId: this.$route.query.movieId }).then(response => {
-          this.jsonData = response.data
-          // 判断电影是否上映
-          new Date() - new Date(this.jsonData.publicDate) >= 0 ? (this.isShowMovie = true) : (this.isShowMovie = false)
-          if (this.jsonData.score) {
-            this.averageScore = this.jsonData.score.toFixed(1)
-            this.starValue = this.averageScore * 0.5
-          }
+        getMovieDetail({ movieId: this.$route.query.movieId })
+          .then(response => {
+            this.jsonData = response.data
+            // 判断电影是否上映
+            new Date() - new Date(this.jsonData.publicDate) >= 0 ? (this.isShowMovie = true) : (this.isShowMovie = false)
+            if (this.jsonData.score) {
+              this.averageScore = this.jsonData.score.toFixed(1)
+              this.starValue = this.averageScore * 0.5
+            }
 
-          if (getToken()) {
-            // 判断用户是否喜欢该电影
-            isWishMovie({ movieId: this.$route.query.movieId }).then(response => {
-              if (response.data) {
-                this.notWishMovie = false
-              } else {
-                this.notWishMovie = true
-              }
-            })
-          }
-          // 获取所有用户通过审核的评论
-          getAllUserPassComment({ movieId: this.$route.query.movieId }).then(response => {
-            if (response.data !== undefined) {
-              let currentIndex = -1
-              this.commentNum = response.data.length
-              response.data.forEach((value, index) => {
-                if (value.userId === getCookie('userInfo').id) {
-                  currentIndex = index
+            if (getToken()) {
+              // 判断用户是否喜欢该电影
+              isWishMovie({ movieId: this.$route.query.movieId }).then(response => {
+                if (response.data) {
+                  this.notWishMovie = false
+                } else {
+                  this.notWishMovie = true
                 }
               })
-              if (currentIndex === -1) {
-                this.currentUserCommentData = []
-              } else {
-                this.currentUserCommentData = response.data.splice(currentIndex, 1)
-              }
-              this.otherUserCommentData = response.data
             }
-          })
 
-          Indicator.close()
-        }).catch(err => {
-          Indicator.close()
-        })
+            if (getToken()) {
+              // 获取当前用户评论
+              getUserComment({ movieId: this.$route.query.movieId }).then(response => {
+                if (response.data !== undefined) {
+                  if (response.data.isPass) {
+                    this.currentUserCommentData[0] = response.data
+                    this.isWatched = true
+                  } else {
+                    this.tempUserComment = response.data
+                  }
+                }
+              })
+            }
+
+            // 获取所有用户通过审核的评论
+            getAllUserPassComment({ movieId: this.$route.query.movieId }).then(response => {
+              if (response.data !== undefined) {
+                this.commentNum = response.data.length
+                this.otherUserCommentData = response.data
+              }
+            })
+
+            Indicator.close()
+          })
+          .catch(err => {
+            Indicator.close()
+          })
       }
     },
     // 想看按钮处理
@@ -173,11 +188,11 @@ export default {
       if (getToken()) {
         // 不想看
         if (this.notWishMovie) {
-          wishMovie({movieId: this.$route.query.movieId}).then(response => {
+          wishMovie({ movieId: this.$route.query.movieId }).then(response => {
             this.notWishMovie = false
           })
         } else {
-          cancelWishMovie({movieId: this.$route.query.movieId}).then(response => {
+          cancelWishMovie({ movieId: this.$route.query.movieId }).then(response => {
             this.notWishMovie = true
           })
         }
@@ -189,72 +204,45 @@ export default {
     watchedBtnHandle() {
       // 用户已登录
       if (getToken()) {
-        this.$router.push({ path: '/comment_panel', query: { comment: this.currentUserCommentData[0], movieId: this.$route.query.movieId } })
+        this.$router.push({ path: '/comment_panel', query: { comment: this.currentUserCommentData[0] ? this.currentUserCommentData[0] : this.tempUserComment, movieId: this.$route.query.movieId } })
       } else {
         this.$router.push('/login')
       }
     },
     // 点赞按钮处理
-    async supportBtnHandle(commentId) {
+    supportBtnHandle(comment) {
       if (getToken()) {
-        let json = await getCommentById(commentId)
         let supportUser, supportNum
-        // 请求成功
-        if (json.success_code === 200) {
-          // 有点赞数据
-          if (json.data.support_user) {
-            supportUser = JSON.parse(json.data.support_user)
-            // 当前用户已点赞
-            if (supportUser.indexOf(Number(this.$cookies.get('user_id'))) > -1) {
-              // 取消点赞
-              supportUser.splice(supportUser.indexOf(Number(this.$cookies.get('user_id'))), 1)
-              supportNum = supportUser.length
-              if (!supportUser.length) {
-                supportUser = undefined
-              }
-            } else {
-              // 点赞
-              supportUser.push(Number(this.$cookies.get('user_id')))
-              supportNum = supportUser.length
+        // 有点赞数据
+        if (comment.supportNum !== 0) {
+          supportUser = JSON.parse(comment.supportUser)
+          // 当前用户已点赞
+          if (supportUser.indexOf(Number(getCookie('userInfo').id)) > -1) {
+            // 取消点赞
+            supportUser.splice(supportUser.indexOf(Number(getCookie('userInfo').id)), 1)
+            supportNum = supportUser.length
+            if (!supportUser.length) {
+              supportUser = undefined
             }
           } else {
-            // 无点赞数据
-            supportUser = []
-            supportUser.push(Number(this.$cookies.get('user_id')))
+            // 点赞
+            supportUser.push(Number(getCookie('userInfo').id))
             supportNum = supportUser.length
           }
-          json = await updateUserSupport(commentId, supportNum, JSON.stringify(supportUser))
-          if (json.success_code === 200) {
-            // 获取所有用户通过审核的评论
-            let commentJson = await getAllUserPassComment(this.$route.query.movieId)
-            if (commentJson.success_code === 200 && commentJson.data.length) {
-              let currentIndex = -1,
-                sum = 0
-              this.commentNum = commentJson.data.length
-              commentJson.data.forEach((value, index) => {
-                if (value.user_id == this.$cookies.get('user_id')) {
-                  currentIndex = index
-                }
-                sum += value.user_score
-              })
-              this.averageScore = sum / commentJson.data.length
-              if (this.averageScore !== 0 && this.averageScore !== 10) {
-                this.averageScore = this.averageScore.toFixed(1)
-              }
-              this.starValue = this.averageScore * 0.5
-              console.log(currentIndex)
-              if (currentIndex === -1) {
-                this.currentUserCommentData = []
-              } else {
-                this.currentUserCommentData = commentJson.data.splice(currentIndex, 1)
-              }
-              this.otherUserCommentData = commentJson.data
-              this.otherUserCommentData.sort((a, b) => {
-                return b.support_num - a.support_num
-              })
-            }
-          }
+        } else {
+          // 无点赞数据
+          supportUser = []
+          supportUser.push(Number(getCookie('userInfo').id))
+          supportNum = supportUser.length
         }
+        updateUserSupport({ id: comment.id, supportNum: supportNum, supportUser: JSON.stringify(supportUser) }).then(response => {
+          comment.supportUser = JSON.stringify(supportUser)
+          comment.supportNum = supportNum
+          if (this.currentUserCommentData[0].id === comment.id) {
+            this.currentUserCommentData.splice(0, 1, comment)
+            console.log(this.currentUserCommentData[0])
+          }
+        })
       } else {
         this.$router.push('/login')
       }
@@ -574,6 +562,7 @@ export default {
               line-height: 0.4rem;
               margin-bottom: 0.1rem;
               text-align: justify;
+              white-space: pre-line;
             }
 
             .bottom {
@@ -618,7 +607,7 @@ export default {
     bottom: 0;
     width: 100%;
     height: 1rem;
-    background-color: #fff;
+    // background-color: #fff;
     color: #fff;
     display: flex;
     justify-content: center;
@@ -633,6 +622,10 @@ export default {
       align-items: center;
       border-radius: 0.4rem;
       font-weight: light;
+    }
+
+    .pre_sell {
+      background-color: #2d98f3;
     }
   }
 }

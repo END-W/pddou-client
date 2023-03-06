@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import cookies from 'vue-cookies'
 import '@/common/icons' // icon
+import '@/permission'
 // 配置字体图标
 import "@/common/css/style.css"
 Vue.config.productionTip = false

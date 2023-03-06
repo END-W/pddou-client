@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Toast, MessageBox } from 'mint-ui'
-import { getToken } from '@/common/utils/auth'
+import { getToken, removeToken, removeCookie } from '@/common/utils/auth'
 
 // 封装ajax
 // export default function ajax(url = '', params = {}, type = 'GET') {
@@ -77,17 +77,22 @@ service.interceptors.response.use(
 
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 20000) {
+
+      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
+      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
+        // to re-login
+        removeToken()
+        removeCookie('userInfo')
+        MessageBox.alert('您已经注销，请重新登录').then(action => {
+          this.$router.push('/login')
+        })
+      }
+
       Toast({
         message: res.message || 'Error',
         position: 'top',
         duration: 5 * 1000
       })
-
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        // to re-login
-        MessageBox.alert('您已经注销，请重新登录')
-      }
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
       return res

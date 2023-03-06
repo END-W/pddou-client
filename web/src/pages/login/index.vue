@@ -138,7 +138,7 @@ export default {
                 duration: 2000
               })
               Indicator.close()
-              setToken(response.data.token, 60 * 60 * 3)
+              setToken(response.data.token, 60 * 60 * 5)
               this.$router.go(-1)
             })
             .catch(err => {

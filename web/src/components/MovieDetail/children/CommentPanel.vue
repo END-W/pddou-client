@@ -55,7 +55,7 @@ export default {
     commentBtnHandle() {
       if (this.textarea) {
         let commentDate = moment().format('YYYY-MM-DD HH:mm:ss')
-        updateUserComment({ movieId: this.$$route.query.movie_id, userScore: this.score, content: this.textarea, commentDate: commentDate }).then(response => {
+        updateUserComment({ movieId: this.$route.query.movieId, userScore: this.score, content: this.textarea, commentDate: commentDate }).then(response => {
           MessageBox.alert('评论成功，待管理员审核！').then(action => {
             this.$router.go(-1)
           })

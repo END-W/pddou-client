@@ -26,7 +26,8 @@ import ModifyUserPhone from '@/pages/my/children/ModifyUserPhone'
 Vue.use(Router);
 
 export default new Router({
-  routes: [{
+  routes: [
+    {
       path: '/',
       redirect: '/home'
     },
@@ -35,6 +36,7 @@ export default new Router({
       name: 'home',
       component: Home,
       meta: {
+        title: '首页',
         showTabBar: true,
       }
     },
@@ -43,6 +45,7 @@ export default new Router({
       name: 'movie',
       component: Movie,
       meta: {
+        title: '电影',
         showTabBar: true
       }
     },
@@ -51,6 +54,7 @@ export default new Router({
       name: 'cinema',
       component: Cinema,
       meta: {
+        title: '影院',
         showTabBar: true
       }
     },
@@ -59,23 +63,33 @@ export default new Router({
       name: 'my',
       component: My,
       meta: {
+        title: '我的',
         showTabBar: true
       }
     },
     {
       path: '/my_info',
       name: 'my_info',
-      component: MyInfo
+      component: MyInfo,
+      meta: {
+        title: '个人信息'
+      }
     },
     {
       path: '/my_order',
       name: 'my_order',
-      component: MyOrder
+      component: MyOrder,
+      meta: {
+        title: '我的订单'
+      }
     },
     {
       path: '/my_movie',
       name: 'my_movie',
-      component: MyMovie
+      component: MyMovie,
+      meta: {
+        title: '我的电影'
+      }
     },
     {
       path: '/modify_username',
@@ -130,7 +144,10 @@ export default new Router({
     },
     {
       path: '/login',
-      component: Login
+      component: Login,
+      meta: {
+        title: '登录'
+      }
     },
   ]
 })
