@@ -8,3 +8,11 @@ export function getMovieDetail(query) {
     params: query
   })
 }
+
+// 获取电影列表
+export function getMovieList() {
+  return request({
+    url: '/api/movie/getMovieList',
+    method: 'get'
+  })
+}

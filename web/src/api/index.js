@@ -4,8 +4,6 @@ import ajax from '../common/utils/ajax'
 //更新用户信息
 export const updateUserInfo = (userId,userName,avatar,password,sex,sign,birthday)=>ajax('/api/updateUserInfo',{userId,userName,avatar,password,sex,sign,birthday},'POST');
 //获取电影列表
-export const getMovieList = ()=>ajax('/api/getMovieList');
-//获取电影列表
 export const getCinemaList = ()=>ajax('/api/getCinemaList');
 //获取当前影院详情
 export const getCurrentCinemaDetail = (cinemaId)=>ajax('/api/getCurrentCinemaDetail',{cinemaId});

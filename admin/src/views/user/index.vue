@@ -37,13 +37,13 @@
       <el-table-column type="index" width="60px" align="center" label="ID">
       </el-table-column>
 
-      <el-table-column width="180px" align="center" label="用户名">
+      <el-table-column width="200px" align="center" label="用户名">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="120px" align="center" label="电话">
+      <el-table-column width="140px" align="center" label="电话">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
@@ -55,25 +55,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="120px" align="center" label="生日">
+      <el-table-column width="140px" align="center" label="生日">
         <template slot-scope="scope">
           <span>{{ scope.row.birthday | parseBirthday }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column min-width="300px" align="center" label="个性签名">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sign | parseSign }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="180px" align="center" label="注册日期">
+      <el-table-column width="200px" align="center" label="注册日期">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="80px" align="center" label="状态">
+      <el-table-column width="100px" align="center" label="状态">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.locked"
@@ -84,7 +78,7 @@
 
       <el-table-column
         v-if="'SUPERADMIN' === roles[0]"
-        width="140px"
+        min-width="140px"
         label="操作"
       >
         <template slot-scope="scope">

@@ -111,6 +111,7 @@ export default {
     left: 0;
     background-color: #dd2727;
     color: #fff;
+    z-index: 99;
 
     .icon-back {
       font-size: 0.4rem;
@@ -138,6 +139,7 @@ export default {
       width: 100%;
       background-color: #fff;
       height: 0.8rem;
+      z-index: 99;
 
       span {
         padding: 0.25rem;

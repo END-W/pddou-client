@@ -29,6 +29,7 @@ export default {
   data() {
     return {
       movieId: undefined,
+      supportUser: null,
       textarea: '',
       score: 0,
       starValue: 0
@@ -47,6 +48,7 @@ export default {
       let comment = this.$route.query.comment
       if (comment) {
         this.movieId = comment.movieId
+        this.supportUser = comment.supportUser
         this.starValue = comment.userScore * 0.5
         this.score = comment.userScore
         this.textarea = comment.content
@@ -55,7 +57,7 @@ export default {
     commentBtnHandle() {
       if (this.textarea) {
         let commentDate = moment().format('YYYY-MM-DD HH:mm:ss')
-        updateUserComment({ movieId: this.$route.query.movieId, userScore: this.score, content: this.textarea, commentDate: commentDate }).then(response => {
+        updateUserComment({ movieId: this.$route.query.movieId, userScore: this.score, supportUser: this.supportUser, content: this.textarea, commentDate: commentDate }).then(response => {
           MessageBox.alert('评论成功，待管理员审核！').then(action => {
             this.$router.go(-1)
           })

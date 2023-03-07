@@ -31,13 +31,13 @@
           <el-rate v-if="isShowMovie" v-model="starValue" allow-half :disabled="true" />
           <span class="noShow" v-else>尚未上映</span>
         </div>
-        <div class="right">
+        <div class="right" v-if="isShowMovie">
           <div class="score">{{ this.averageScore ? this.averageScore : 0 }}<span class="small">分</span></div>
           <div class="score-people">{{ commentNum ? commentNum : '暂无' }}人评</div>
         </div>
-      </div>
-      <div class="wish" v-if="!isShowMovie">
-        <span class="wish-number"><span v-if="jsonData.wishNum" style="font-family: PingFangSC-Regular, Hiragino Sans GB, sans-serif;font-size: .6rem">{{ jsonData.wishNum }}</span><span v-else>暂无</span></span>人想看
+        <div class="wish" v-else>
+          <span class="wish-number"><span v-if="jsonData.wishNum" style="font-family: PingFangSC-Regular, Hiragino Sans GB, sans-serif;font-size: .6rem">{{ jsonData.wishNum }}</span><span v-else>暂无</span></span>人想看
+        </div>
       </div>
     </div>
     <div class="intro">
@@ -161,6 +161,7 @@ export default {
                   if (response.data.isPass) {
                     this.currentUserCommentData[0] = response.data
                     this.isWatched = true
+                    this.commentNum += 1
                   } else {
                     this.tempUserComment = response.data
                   }
@@ -171,7 +172,7 @@ export default {
             // 获取所有用户通过审核的评论
             getAllUserPassComment({ movieId: this.$route.query.movieId }).then(response => {
               if (response.data !== undefined) {
-                this.commentNum = response.data.length
+                this.commentNum += response.data.length
                 this.otherUserCommentData = response.data
               }
             })
@@ -430,7 +431,7 @@ export default {
 
         .noShow {
           font-size: 0.17rem;
-          line-height: 0.8rem;
+          line-height: 0.9rem;
         }
 
         i {
@@ -440,7 +441,7 @@ export default {
     }
 
     .wish {
-      font-size: 0.4rem;
+      font-size: 0.3rem;
       padding: 0.2rem 0;
       vertical-align: text-bottom;
       line-height: 0.48rem;

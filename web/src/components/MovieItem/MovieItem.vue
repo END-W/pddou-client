@@ -1,11 +1,11 @@
 <template>
   <div v-if="movieList.length">
     <div class="movie-item" v-for="(item,index) in movieList" :key="index">
-      <img :src="item.poster" alt="" @click="$router.push({path:'/movie_detail', query:{movieId: item.id}})">
+      <img :src="item.poster" alt="" @click="$router.push({path:'/movie_detail', query: {movieId: item.id}})">
       <div class="info">
-        <div class="name" @click="$router.push({path:'/movie_detail', query:{movieId: item.id}})" v-html="ruleName(item.name)"></div>
+        <div class="name" @click="$router.push({path:'/movie_detail', query: {movieId: item.id}})" v-html="ruleName(item.name)"></div>
         <div>
-          <div class="descInfo" v-if="item.score">评分：<span class="number">{{item.score.toFixed(1)}}</span></div>
+          <div class="descInfo" v-if="item.score">评分：<span class="number">{{ item.score.toFixed(1) }}</span></div>
           <div class="descInfo" v-else>暂无评分</div>
         </div>
         <div>

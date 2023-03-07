@@ -5,7 +5,7 @@ import Router from 'vue-router'
 const Login = () => import('@/pages/login/index');
 import Home from '@/pages/Home/Home'
 import SearchAll from '@/pages/Home/children/SearchAll'
-import Movie from '@/pages/Movie/Movie'
+import Movie from '@/pages/movie/index'
 import SearchMovie from '@/pages/Movie/children/SearchMovie'
 import MovieDetail from '@/components/MovieDetail/MovieDetail'
 import CommentPanel from '@/components/MovieDetail/children/CommentPanel'

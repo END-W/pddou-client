@@ -42,13 +42,13 @@
       <el-table-column type="index" width="60px" align="center" label="ID">
       </el-table-column>
 
-      <el-table-column width="120px" align="center" label="用户名">
+      <el-table-column width="150px" align="center" label="用户名">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="120px" align="center" label="姓名">
+      <el-table-column width="140px" align="center" label="姓名">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
@@ -56,11 +56,11 @@
 
       <el-table-column width="180px" align="center" label="邮箱">
         <template slot-scope="scope">
-          <span>{{ scope.row.email }}</span>
+          <span>{{ scope.row.email | parseEmail }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="120px" align="center" label="电话">
+      <el-table-column width="140px" align="center" label="电话">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
@@ -75,7 +75,7 @@
       <el-table-column
         v-if="'SUPERADMIN' === roles[0]"
         class-name="status-col"
-        width="150"
+        width="120"
         align="center"
         label="账号类型"
       >
@@ -87,9 +87,9 @@
       </el-table-column>
 
       <el-table-column
-        v-if="'SUPERADMIN' === roles[0]"
+        v-if="'SUPERADMIN' === roles[0] || 'ADMIN' === roles[0]"
         class-name="status-col"
-        width="130"
+        width="120"
         align="center"
         label="角色类型"
       >
@@ -263,6 +263,12 @@ export default {
         SECRET: '保密'
       }
       return genderMap[gender]
+    },
+    parseEmail(email) {
+      if (!email) {
+        return '暂无'
+      }
+      return email
     },
     typeFilter(status) {
       const statusMap = {
