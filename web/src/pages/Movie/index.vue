@@ -20,7 +20,7 @@
 <script>
 import { Indicator } from 'mint-ui'
 import MovieItem from '@/components/MovieItem/MovieItem'
-import { getMovieList } from '@/api/movie.js'
+import { getMovieList } from '@/api/movie'
 
 export default {
   name: 'Movie',
@@ -39,7 +39,7 @@ export default {
   },
   created() {
     Indicator.open('Loading...')
-    if (this.$route.query.hotMovie === 0) {
+    if (this.$route.query.hotMovie == 0) {
       this.isHotMovie = false
     }
     this.loadMovieList()

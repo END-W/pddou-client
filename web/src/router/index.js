@@ -3,10 +3,10 @@ import Router from 'vue-router'
 
 
 const Login = () => import('@/pages/login/index');
-import Home from '@/pages/Home/Home'
-import SearchAll from '@/pages/Home/children/SearchAll'
+import Home from '@/pages/home/index'
+import SearchAll from '@/pages/home/children/SearchAll'
 import Movie from '@/pages/movie/index'
-import SearchMovie from '@/pages/Movie/children/SearchMovie'
+import SearchMovie from '@/pages/movie/children/SearchMovie'
 import MovieDetail from '@/components/MovieDetail/MovieDetail'
 import CommentPanel from '@/components/MovieDetail/children/CommentPanel'
 import Cinema from '@/pages/Cinema/Cinema'
@@ -94,53 +94,89 @@ export default new Router({
     {
       path: '/modify_username',
       name: 'modify_username',
-      component: ModifyUserName
+      component: ModifyUserName,
+      meta: {
+        title: '个人信息'
+      }
     },
     {
       path: '/modify_userphone',
       name: 'modify_userphone',
-      component: ModifyUserPhone
+      component: ModifyUserPhone,
+      meta: {
+        title: '个人信息'
+      }
     },
     {
       path: '/search_all',
-      component: SearchAll
+      component: SearchAll,
+      meta: {
+        title: '搜索'
+      }
     },
     {
       path: '/search_movie',
-      component: SearchMovie
+      component: SearchMovie,
+      meta: {
+        title: '电影'
+      }
     },
     {
       path: '/movie_detail',
       name: 'movie_detail',
-      component: MovieDetail
+      component: MovieDetail,
+      meta: {
+        title: '电影详情'
+      }
     },
     {
       path: '/cinema_detail',
-      component: CinemaDetail
+      component: CinemaDetail,
+      meta: {
+        title: '影院详情'
+      }
     },
     {
       path: '/select_cinema',
-      component: SelectCinema
+      component: SelectCinema,
+      meta: {
+        title: '选影院'
+      }
     },
     {
       path: '/select_seat',
-      component: SelectSeat
+      component: SelectSeat,
+      meta: {
+        title: '选座'
+      }
     },
     {
       path: '/comment_panel',
-      component: CommentPanel
+      component: CommentPanel,
+      meta: {
+        title: '写影评'
+      }
     },
     {
       path: '/search_cinema',
-      component: SearchCinema
+      component: SearchCinema,
+      meta: {
+        title: '影院'
+      }
     },
     {
       path: '/submit_order',
-      component: SubmitOrder
+      component: SubmitOrder,
+      meta: {
+        title: '提交订单'
+      }
     },
     {
       path: '/pay',
-      component: Pay
+      component: Pay,
+      meta: {
+        title: '支付'
+      }
     },
     {
       path: '/login',
