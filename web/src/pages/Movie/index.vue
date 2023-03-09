@@ -1,7 +1,7 @@
 <template>
   <div id="movie">
     <div class="tab-header">
-      <span class="location">成都</span>
+      <span class="location">{{ city | parseLocation }}</span>
       <span :class="['normal', {'active': isHotMovie}]" @click="optionMovieType(true)">正在热映</span>
       <span :class="['normal', {'active': !isHotMovie}]" @click="optionMovieType(false)">即将上映</span>
       <span class=" icon-search" @click="$router.push('search_movie')"></span>
@@ -21,6 +21,7 @@
 import { Indicator } from 'mint-ui'
 import MovieItem from '@/components/MovieItem/MovieItem'
 import { getMovieList } from '@/api/movie'
+import { getCookie } from '@/common/utils/auth'
 
 export default {
   name: 'Movie',
@@ -34,7 +35,18 @@ export default {
       // 热门电影列表
       hotMovieList: [],
       // 未上映电影列表
-      notShowMovieList: []
+      notShowMovieList: [],
+      city: '北京'
+    }
+  },
+  filters: {
+    // 解析地址
+    parseLocation() {
+      let location = getCookie('location')
+      if (location) {
+        return location.city.replace('市', '')
+      }
+      return this.city
     }
   },
   created() {

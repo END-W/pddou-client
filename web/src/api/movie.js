@@ -16,3 +16,12 @@ export function getMovieList() {
     method: 'get'
   })
 }
+
+// 根据名字模糊匹配电影
+export function matchMovieByName(query) {
+  return request({
+    url: '/api/movie/matchMovieByName',
+    method: 'get',
+    params: query
+  })
+}

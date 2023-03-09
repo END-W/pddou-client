@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-
 const Login = () => import('@/pages/login/index');
 import Home from '@/pages/home/index'
 import SearchAll from '@/pages/home/children/SearchAll'
@@ -9,9 +8,9 @@ import Movie from '@/pages/movie/index'
 import SearchMovie from '@/pages/movie/children/SearchMovie'
 import MovieDetail from '@/components/MovieDetail/MovieDetail'
 import CommentPanel from '@/components/MovieDetail/children/CommentPanel'
-import Cinema from '@/pages/Cinema/Cinema'
+import Cinema from '@/pages/cinema/index'
 import CinemaDetail from '@/components/CinemaDetail/CinemaDetail'
-import SearchCinema from '@/pages/Cinema/children/SearchCinema'
+import SearchCinema from '@/pages/cinema/children/SearchCinema'
 import SelectCinema from '@/components/SelectCinema/SelectCinema'
 import SelectSeat from '@/components/SelectSeat/SelectSeat'
 import SubmitOrder from '@/components/SubmitOrder/SubmitOrder'
@@ -111,14 +110,16 @@ export default new Router({
       path: '/search_all',
       component: SearchAll,
       meta: {
-        title: '搜索'
+        title: '搜索',
+        keepAlive: true
       }
     },
     {
       path: '/search_movie',
       component: SearchMovie,
       meta: {
-        title: '电影'
+        title: '电影',
+        keepAlive: true
       }
     },
     {
@@ -161,7 +162,8 @@ export default new Router({
       path: '/search_cinema',
       component: SearchCinema,
       meta: {
-        title: '影院'
+        title: '影院',
+        keepAlive: true
       }
     },
     {
@@ -185,5 +187,12 @@ export default new Router({
         title: '登录'
       }
     },
-  ]
+  ],
+  scrollBehavior (to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
+  }
 })

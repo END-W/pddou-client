@@ -3,8 +3,6 @@ import ajax from '../common/utils/ajax'
 
 //更新用户信息
 export const updateUserInfo = (userId,userName,avatar,password,sex,sign,birthday)=>ajax('/api/updateUserInfo',{userId,userName,avatar,password,sex,sign,birthday},'POST');
-//获取电影列表
-export const getCinemaList = ()=>ajax('/api/getCinemaList');
 //获取当前影院详情
 export const getCurrentCinemaDetail = (cinemaId)=>ajax('/api/getCurrentCinemaDetail',{cinemaId});
 //获取当前影院的排片
@@ -15,8 +13,6 @@ export const getScheduleById = (scheduleId)=>ajax('/api/getScheduleById',{schedu
 export const updateScheduleSeat = (scheduleId,seatInfo)=>ajax('/api/updateScheduleSeat',{scheduleId,seatInfo},'POST');
 //获取当前电影的排片
 export const getCurrentMovieSchedule = (movieId)=>ajax('/api/getCurrentMovieSchedule',{movieId});
-//根据名字模糊匹配电影
-export const matchMovieByName = (movieName)=>ajax('/api/matchMovieByName',{movieName});
 //根据名字模糊匹配影院
 export const matchCinemaByName = (cinemaName)=>ajax('/api/matchCinemaByName',{cinemaName});
 //用户下单

@@ -1,7 +1,7 @@
 <template>
   <div id="home">
-    <div :class="['search-header',{'active': headerActive}]">
-      <span class="location">成都</span>
+    <div :class="['search-header', {'active': headerActive}]">
+      <span class="location">{{ city | parseLocation }}</span>
       <span class="search"><span class="icon-search"></span><input type="text" placeholder="找电影、影院" @focus="$router.push('search_all')"></span>
       <span class="date"><span class="calender"><span class="day">{{ new Date().getDate() < 10 ? '0' + new Date().getDate() : new Date().getDate() }}</span></span></span>
     </div>
@@ -37,7 +37,7 @@
                 <span class="score" v-if="item.score"><i class="interger">{{ item.score.toFixed(1).split('.')[0] }}</i>.<i class="fraction">{{ item.score.toFixed(1).split('.')[1] }}</i></span>
               </div>
             </div>
-            <div class="buy" @click="$router.push({path:'/select_cinema', query: {movie_id: item.id}})">购票</div>
+            <div class="buy" @click="$router.push({path:'/select_cinema', query: {movieId: item.id}})">购票</div>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
               <div class="name ellipsis">{{ item.name }}</div>
               <div class="info">
                 <span class="date">{{ item.publicDate.split('-')[1] }}月{{ item.publicDate.split('-')[2] }}日</span>
-                <span class="btn" @click="$router.push({path:'/select_cinema',query:{movieId: item.id}})">预售</span>
+                <span class="btn" @click="$router.push({path:'/select_cinema', query:{movieId: item.id}})">预售</span>
               </div>
             </div>
           </div>
@@ -73,6 +73,7 @@ import { Indicator } from 'mint-ui'
 import Swiper from 'swiper'
 import 'swiper/dist/css/swiper.min.css'
 import { getMovieList } from '@/api/movie'
+import { getCookie } from '@/common/utils/auth'
 
 export default {
   name: 'Home',
@@ -83,7 +84,18 @@ export default {
       // 热门电影列表
       hotMovieList: [],
       // 未上映电影列表
-      notShowMovieList: []
+      notShowMovieList: [],
+      city: '北京'
+    }
+  },
+  filters: {
+    // 解析地址
+    parseLocation() {
+      let location = getCookie('location')
+      if (location) {
+        return location.city.replace('市', '')
+      }
+      return this.city
     }
   },
   created() {
