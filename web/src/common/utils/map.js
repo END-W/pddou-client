@@ -1,5 +1,7 @@
 import { setCookie } from '@/common/utils/auth'
 
+let walking;
+
 // 获取位置
 export function getLocation(AMap) {
   let geolocation = new AMap.Geolocation({
@@ -30,4 +32,15 @@ export function getLocation(AMap) {
       console.log(result)
     }
   })
+}
+
+// 设置步行导航
+export function setWalking(AMap) {
+  // 步行导航
+  walking = new AMap.Walking()
+}
+
+// 获取步行导航、
+export function getWalking() {
+  return walking
 }

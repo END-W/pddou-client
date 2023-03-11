@@ -12,7 +12,7 @@
 import TabBar from './components/TabBar/TabBar'
 import 'mint-ui/lib/style.css'
 import AMapLoader from '@amap/amap-jsapi-loader'
-import { getLocation } from '@/common/utils/map'
+import { getLocation, setWalking } from '@/common/utils/map'
 
 // 设置安全密钥
 window._AMapSecurityConfig = {
@@ -40,12 +40,14 @@ export default {
         key: '890e60b02e97f9681d403bbb577284c7',
         version: '2.0',
         plugins: [
-          'AMap.Geolocation'
+          'AMap.Geolocation',
+          'AMap.Walking'
         ],
       })
         .then((AMap) => {
           this.AMap = AMap
           getLocation(AMap)
+          setWalking(AMap)
         })
         .catch((e) => {
           console.log('高德地图加载错误', e)

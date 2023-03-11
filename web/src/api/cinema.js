@@ -8,3 +8,12 @@ export function getCinemaList(query) {
     params: query
   })
 }
+
+// 根据名字模糊匹配影院
+export function matchCinemaByName(query) {
+  return request({
+    url: '/api/cinema/matchCinemaByName',
+    method: 'get',
+    params: query
+  })
+}

@@ -40,7 +40,7 @@ export default {
     name(newVal, oldVal) {
       this.movieInfo = []
       clearTimeout(this.timer)
-      if (newVal !== '') {
+      if (newVal) {
         this.timer = setTimeout(() => {
           matchMovieByName({movieName: newVal}).then(response => {
             this.movieInfo = response.data
@@ -52,7 +52,6 @@ export default {
   methods: {
     back() {
       this.name = ''
-      console.log(this.movieInfo)
       this.$router.back()
     }
   }

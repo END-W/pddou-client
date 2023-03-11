@@ -41,12 +41,12 @@ export default {
   },
   filters: {
     // 解析地址
-    parseLocation() {
+    parseLocation(city) {
       let location = getCookie('location')
       if (location) {
         return location.city.replace('市', '')
       }
-      return this.city
+      return city
     }
   },
   created() {

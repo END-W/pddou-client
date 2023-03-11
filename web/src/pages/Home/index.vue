@@ -58,7 +58,7 @@
               <div class="name ellipsis">{{ item.name }}</div>
               <div class="info">
                 <span class="date">{{ item.publicDate.split('-')[1] }}月{{ item.publicDate.split('-')[2] }}日</span>
-                <span class="btn" @click="$router.push({path:'/select_cinema', query:{movieId: item.id}})">预售</span>
+                <span class="btn" @click="$router.push({path:'/select_cinema', query: {movieId: item.id}})">预售</span>
               </div>
             </div>
           </div>
@@ -90,12 +90,12 @@ export default {
   },
   filters: {
     // 解析地址
-    parseLocation() {
+    parseLocation(city) {
       let location = getCookie('location')
       if (location) {
         return location.city.replace('市', '')
       }
-      return this.city
+      return city
     }
   },
   created() {

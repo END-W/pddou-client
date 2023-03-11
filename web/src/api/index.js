@@ -13,7 +13,5 @@ export const getScheduleById = (scheduleId)=>ajax('/api/getScheduleById',{schedu
 export const updateScheduleSeat = (scheduleId,seatInfo)=>ajax('/api/updateScheduleSeat',{scheduleId,seatInfo},'POST');
 //获取当前电影的排片
 export const getCurrentMovieSchedule = (movieId)=>ajax('/api/getCurrentMovieSchedule',{movieId});
-//根据名字模糊匹配影院
-export const matchCinemaByName = (cinemaName)=>ajax('/api/matchCinemaByName',{cinemaName});
 //用户下单
 export const order = (userId,scheduleId,orderPhone,orderDate,ticketNum,totalPrice,orderSeatInfo,payType)=>ajax('/api/order',{userId,scheduleId,orderPhone,orderDate,ticketNum,totalPrice,orderSeatInfo,payType},'POST');

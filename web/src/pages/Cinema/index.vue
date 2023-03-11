@@ -14,9 +14,9 @@
           <div class="address ellipsis">{{ item.specifiedAddress }}</div>
           <div class="label-block"><span>小吃</span><span>4D厅</span><span>巨幕厅</span><span>杜比全景声厅</span></div>
         </div>
-        <!--<div class="right">-->
-        <!--<div class="price-block"><span class="price">23</span>元起</div>-->
-        <!--</div>-->
+        <div class="right">
+          <div class="price-block"><span class="price">{{ item.distance | parseToKm }}</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -26,6 +26,8 @@
 import { Indicator } from 'mint-ui'
 import { getCinemaList } from '@/api/cinema'
 import { getCookie } from '@/common/utils/auth'
+import { getWalking } from '@/common/utils/map'
+import { kmUnit } from '@/common/utils/util'
 
 export default {
   name: 'Cinema',
@@ -37,12 +39,15 @@ export default {
   },
   filters: {
     // 解析地址
-    parseLocation() {
+    parseLocation(city) {
       let location = getCookie('location')
       if (location) {
         return location.city.replace('市', '')
       }
-      return this.city
+      return city
+    },
+    parseToKm(m) {
+      return kmUnit(m)
     }
   },
   created() {
@@ -52,12 +57,29 @@ export default {
   methods: {
     // 加载电影列表
     loadCinemaList() {
-      getCinemaList({movieId: this.$route.query.movieId, city: getCookie('location').city}).then(response => {
-        this.jsonData = response.data
-        Indicator.close()
-      }).catch(err => {
-        Indicator.close()
-      })
+      getCinemaList({city: getCookie('location').city})
+        .then(response => {
+          this.jsonData = response.data
+          this.jsonData.forEach(v => {
+            // 根据起终点坐标规划步行路线
+            getWalking().search([getCookie('location').lng, getCookie('location').lat], [v.lng, v.lat], (status, result) => {
+              if (status === 'complete') {
+                v.distance = result.routes[0].distance
+              } else {
+                v.distance = 0
+              }
+            })
+          })
+          setTimeout(() => {
+            this.jsonData.sort((a, b) => {
+              return a.distance - b.distance
+            })
+          }, 300)
+          Indicator.close()
+        })
+        .catch(err => {
+          Indicator.close()
+        })
     }
   }
 }
@@ -162,7 +184,7 @@ export default {
       margin-bottom: 0.25rem;
 
       .left {
-        width: 100%;
+        width: 80%;
 
         .name {
           font-size: 0.345rem;
@@ -194,13 +216,13 @@ export default {
 
       .right {
         width: 20%;
-        text-align: center;
+        text-align: right;
 
         .price-block {
           color: #dd2727;
 
           .price {
-            font-size: 0.38rem;
+            font-size: 0.23rem;
           }
         }
       }
