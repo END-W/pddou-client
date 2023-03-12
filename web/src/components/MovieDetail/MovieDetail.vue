@@ -32,7 +32,7 @@
           <span class="noShow" v-else>尚未上映</span>
         </div>
         <div class="right" v-if="isShowMovie">
-          <div class="score">{{ this.averageScore ? this.averageScore : 0 }}<span class="small">分</span></div>
+          <div class="score">{{ averageScore ? averageScore : 0 }}<span class="small">分</span></div>
           <div class="score-people">{{ commentNum ? commentNum : '暂无' }}人评</div>
         </div>
         <div class="wish" v-else>
@@ -88,7 +88,7 @@
       <div 
         class="btn" 
         :class="{pre_sell: new Date(jsonData.publicDate) - new Date() > 0}" 
-        @click="$router.push({path: '/select_cinema', query: {movieId: $route.query.movieId}})"
+        @click="$router.push({path: '/select_cinema', query: {movieId: $route.query.movieId, name: jsonData.name}})"
       >
         {{ new Date(jsonData.publicDate) - new Date() > 0 ? '预售购票' : '特惠购票' }}
       </div>

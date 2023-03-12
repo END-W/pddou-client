@@ -2,7 +2,7 @@
   <div id="select-cinema">
     <div class="top">
       <span class="icon-back" @click="$router.go(-1)"></span>
-      <span class="name ellipsis">{{ movieInfo.name }}</span>
+      <span class="name ellipsis">{{ $route.query.name }}</span>
     </div>
     <ly-tab v-model="selectedId" :items="items" :options="options" class="ly-tab" v-if="hackReset" @change="changeLyTabItem" />
     <div class="content">
@@ -12,9 +12,9 @@
           <div class="address ellipsis">{{ item.specifiedAddress }}</div>
           <div class="label-block"><span>小吃</span><span>4D厅</span><span>杜比全景声厅</span><span>巨幕厅</span></div>
         </div>
-        <!--<div class="right">-->
-        <!--<div class="price-block"><span class="price">23</span>元起</div>-->
-        <!--</div>-->
+        <div class="right">
+          <div class="price-block"><span class="price">{{ item.distance | parseToKm }}</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -24,8 +24,10 @@
 import { Indicator } from 'mint-ui'
 import Vue from 'vue'
 import LyTab from 'ly-tab'
-import { getMovieDetail, getCurrentMovieSchedule } from '../../api/index'
-import { formatDate } from '@/common/utils/util'
+import { getCurrentMovieSchedule } from '@/api/movie'
+import { formatDate, kmUnit } from '@/common/utils/util'
+import { getCookie } from '@/common/utils/auth'
+import { getWalking } from '@/common/utils/map'
 
 Vue.use(LyTab)
 
@@ -33,7 +35,6 @@ export default {
   name: 'SelectCinema',
   data() {
     return {
-      movieInfo: '',
       selectedId: 0,
       hasCinemaInfo: [],
       cinemaScheduleInfo: [],
@@ -45,52 +46,68 @@ export default {
       }
     }
   },
+  filters: {
+    parseToKm(m) {
+      return kmUnit(m)
+    }
+  },
   created() {
     Indicator.open('Loading...')
     this.loadInfo()
   },
   methods: {
-    async loadInfo() {
-      let json = await getMovieDetail(this.$route.query.movie_id)
-      if (json.success_code === 200) {
-        this.movieInfo = json.data[0]
-      }
-      json = await getCurrentMovieSchedule(this.$route.query.movie_id)
-      if (json.success_code === 200) {
-        this.hasCinemaInfo = json.data.hasCinemaInfo
-        this.cinemaScheduleInfo = json.data.cinemaScheduleInfo
-        this.cinemaScheduleInfo.forEach(value => {
-          this.removeRepeat(value, 'cinema_id')
+    loadInfo() {
+      getCurrentMovieSchedule({ movieId: this.$route.query.movieId, city: getCookie('location').city })
+        .then(response => {
+          if (Object.keys(response.data).length !== 0) {
+            for (let key in response.data) {
+              this.hasCinemaInfo.push({ id: new Date(key).getTime(), showDate: key })
+            }
+          }
+          this.hasCinemaInfo.sort((a, b) => {
+            return a.id - b.id
+          })
+          this.cinemaScheduleInfo = response.data
+          this.hasCinemaInfo.forEach(value => {
+            this.items.push({ label: formatDate(new Date(value.showDate), true), date: value.showDate })
+          })
+          this.hackReset = false
+          this.$nextTick(() => {
+            this.hackReset = true
+          }) 
+          this.cinemaWalking(this.cinemaScheduleInfo[this.hasCinemaInfo[0].showDate])
+          Indicator.close()
         })
-        this.hasCinemaInfo.forEach(value => {
-          this.items.push({ label: formatDate(new Date(value[0].show_date), true), date: value[0].show_date })
+        .catch(err => {
+          Indicator.close()
         })
-        this.hackReset = false
-        this.$nextTick(() => {
-          this.hackReset = true
-        })
-        this.dateCinemaSchedule = this.cinemaScheduleInfo[0]
-      }
-      Indicator.close()
     },
-    //切换日期
+    // 切换日期
     changeLyTabItem(item) {
-      this.hasCinemaInfo.forEach((value, index) => {
-        if (value[0].show_date === item.date) {
-          this.dateCinemaSchedule = this.cinemaScheduleInfo[index]
+      this.hasCinemaInfo.forEach(value => {
+        if (value.showDate === item.date) {
+          this.cinemaWalking(this.cinemaScheduleInfo[value.showDate])
         }
       })
     },
-    //去除重复的影院
-    removeRepeat(arr, key) {
-      for (let i = 0; i < arr.length; i++) {
-        for (let j = i + 1; j < arr.length; j++) {
-          if (arr[i][key] === arr[j][key]) {
-            arr.splice(j, 1)
-            j = j - 1
+    // 影院步行规划
+    cinemaWalking(list) {
+      list.forEach(v => {
+        // 根据起终点坐标规划步行路线
+        getWalking().search([getCookie('location').lng, getCookie('location').lat], [v.lng, v.lat], (status, result) => {
+          if (status === 'complete') {
+            v.distance = result.routes[0].distance
+          } else {
+            v.distance = 0
           }
-        }
-      }
+        })
+      })
+      setTimeout(() => {
+        list.sort((a, b) => {
+          return a.distance - b.distance
+        })
+        this.dateCinemaSchedule = list
+      }, 300)
     }
   }
 }
@@ -196,7 +213,7 @@ export default {
       margin-bottom: 0.25rem;
 
       .left {
-        width: 100%;
+        width: 80%;
 
         .name {
           font-size: 0.345rem;
@@ -228,13 +245,13 @@ export default {
 
       .right {
         width: 20%;
-        text-align: center;
+        text-align: right;
 
         .price-block {
           color: #dd2727;
 
           .price {
-            font-size: 0.38rem;
+            font-size: 0.23rem;
           }
         }
       }

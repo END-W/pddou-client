@@ -37,7 +37,7 @@
                 <span class="score" v-if="item.score"><i class="interger">{{ item.score.toFixed(1).split('.')[0] }}</i>.<i class="fraction">{{ item.score.toFixed(1).split('.')[1] }}</i></span>
               </div>
             </div>
-            <div class="buy" @click="$router.push({path:'/select_cinema', query: {movieId: item.id}})">购票</div>
+            <div class="buy" @click="$router.push({path:'/select_cinema', query: {movieId: item.id, name: item.name}})">购票</div>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
               <div class="name ellipsis">{{ item.name }}</div>
               <div class="info">
                 <span class="date">{{ item.publicDate.split('-')[1] }}月{{ item.publicDate.split('-')[2] }}日</span>
-                <span class="btn" @click="$router.push({path:'/select_cinema', query: {movieId: item.id}})">预售</span>
+                <span class="btn" @click="$router.push({path:'/select_cinema', query: {movieId: item.id, name: item.name}})">预售</span>
               </div>
             </div>
           </div>

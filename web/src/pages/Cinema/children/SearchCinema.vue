@@ -56,8 +56,7 @@ export default {
       if (newVal) {
         this.timer = setTimeout(() => {
           matchCinemaByName({ cinemaName: newVal, city: getCookie('location').city }).then(response => {
-            this.cinemaInfo = response.data
-            this.cinemaInfo.forEach(v => {
+            response.data.forEach(v => {
               // 根据起终点坐标规划步行路线
               getWalking().search([getCookie('location').lng, getCookie('location').lat], [v.lng, v.lat], (status, result) => {
                 if (status === 'complete') {
@@ -68,9 +67,10 @@ export default {
               })
             })
             setTimeout(() => {
-              this.cinemaInfo.sort((a, b) => {
+              response.data.sort((a, b) => {
                 return a.distance - b.distance
               })
+              this.cinemaInfo = response.data
             }, 300)
           })
         }, 500)

@@ -25,3 +25,12 @@ export function matchMovieByName(query) {
     params: query
   })
 }
+
+// 获取当前电影的排片
+export function getCurrentMovieSchedule(query) {
+  return request({
+    url: '/api/movie/getCurrentMovieSchedule',
+    method: 'get',
+    params: query
+  })
+}

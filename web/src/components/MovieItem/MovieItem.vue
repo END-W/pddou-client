@@ -19,7 +19,7 @@
         class="buy" 
         v-if="item.isShow" 
         :class="{pre_sell: new Date(item.publicDate) - new Date() > 0}" 
-        @click="$router.push({path: '/select_cinema', query: {movieId: item.id}})
+        @click="$router.push({path: '/select_cinema', query: {movieId: item.id, name: item.name}})
       ">
         {{ new Date(item.publicDate) - new Date() > 0 ? '预售': '购票' }}
       </span>
