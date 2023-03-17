@@ -3,10 +3,6 @@ import ajax from '../common/utils/ajax'
 
 //更新用户信息
 export const updateUserInfo = (userId,userName,avatar,password,sex,sign,birthday)=>ajax('/api/updateUserInfo',{userId,userName,avatar,password,sex,sign,birthday},'POST');
-//获取当前影院详情
-export const getCurrentCinemaDetail = (cinemaId)=>ajax('/api/getCurrentCinemaDetail',{cinemaId});
-//获取当前影院的排片
-export const getCurrentCinemaMovieSchedule = (cinemaId)=>ajax('/api/getCurrentCinemaMovieSchedule',{cinemaId});
 //获取排片详情
 export const getScheduleById = (scheduleId)=>ajax('/api/getScheduleById',{scheduleId});
 //更新排片座位信息

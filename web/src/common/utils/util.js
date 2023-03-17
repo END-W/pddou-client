@@ -2,8 +2,11 @@
 export const formatDate = function (date, flag) {
   if (date instanceof Date) {
     let now = new Date()
-    let today = now.getFullYear() + '-0' + (now.getMonth() + 1) + '-' + now.getDate()
-    let differTime = date.getTime() - new Date(today)
+    let today
+    if (flag) {
+      today = now.getFullYear() + '-0' + (now.getMonth() + 1) + '-' + now.getDate()
+    }
+    let differTime = date.getTime() - (flag ? new Date(today) : new Date())
     let date_day = parseInt(differTime / 24 / 60 / 60 / 1000)
     let date_hours = parseInt(Math.abs(differTime / 60 / 60 / 1000))
     let date_minutes = parseInt(Math.abs(differTime / 60 / 1000))

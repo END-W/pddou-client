@@ -6,7 +6,7 @@
     </div>
     <ly-tab v-model="selectedId" :items="items" :options="options" class="ly-tab" v-if="hackReset" @change="changeLyTabItem" />
     <div class="content">
-      <div class="item" v-for="(item, index) in dateCinemaSchedule" :key="index" @click="$router.push({path: '/cinema_detail', query: {movie_id: $route.query.movieId, cinema_id: item.id}})">
+      <div class="item" v-for="(item, index) in dateCinemaSchedule" :key="index" @click="$router.push({path: '/cinema_detail', query: {movieId: $route.query.movieId, cinemaId: item.id}})">
         <div class="left">
           <div class="name ellipsis">{{ item.cinemaName }}</div>
           <div class="address ellipsis">{{ item.specifiedAddress }}</div>
@@ -72,9 +72,11 @@ export default {
             this.items.push({ label: formatDate(new Date(value.showDate), true), date: value.showDate })
           })
           this.hackReset = false
-          this.$nextTick(() => {
-            this.hackReset = true
-          }) 
+          if (this.hasCinemaInfo.length > 0) {
+            this.$nextTick(() => {
+              this.hackReset = true
+            })
+          }
           this.cinemaWalking(this.cinemaScheduleInfo[this.hasCinemaInfo[0].showDate])
           Indicator.close()
         })

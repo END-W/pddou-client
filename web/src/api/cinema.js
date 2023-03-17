@@ -17,3 +17,21 @@ export function matchCinemaByName(query) {
     params: query
   })
 }
+
+// 获取当前影院详情
+export function getCurrentCinemaDetail(query) {
+  return request({
+    url: '/api/cinema/getCurrentCinemaDetail',
+    method: 'get',
+    params: query
+  })
+}
+
+// 获取当前影院的排片
+export function getCurrentCinemaMovieSchedule(query) {
+  return request({
+    url: '/api/cinema/getCurrentCinemaMovieSchedule',
+    method: 'get',
+    params: query
+  })
+}

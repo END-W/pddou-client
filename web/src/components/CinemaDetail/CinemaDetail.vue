@@ -2,41 +2,41 @@
   <div id="cinema-detail">
     <div class="top">
       <span class="icon-back" @click="$router.go(-1)"></span>
-      <span class="name ellipsis">{{currentCinemaInfo.cinema_name}}</span>
+      <span class="name ellipsis">{{ currentCinemaInfo.cinemaName }}</span>
     </div>
     <div class="cinema-info">
-      <span class="name">{{currentCinemaInfo.cinema_name}}</span>
-      <span class="address"><span class="icon icon-address"></span>{{currentCinemaInfo.specified_address}}</span>
-      <span class="tel"><span class="icon icon-tel"></span>{{currentCinemaInfo.cinema_phone}}</span>
+      <span class="name">{{ currentCinemaInfo.cinemaName }}</span>
+      <span class="address"><span class="icon icon-address"></span>{{ currentCinemaInfo.specifiedAddress }}</span>
+      <span class="tel"><span class="icon icon-tel"></span>{{ currentCinemaInfo.cinemaPhone }}</span>
     </div>
     <el-carousel :autoplay=false type="card" height="5rem" arrow="never" :loop=false :initial-index=initMovieId indicator-position="none" @change="changeCarousel" v-if="carouselReset">
-      <el-carousel-item v-for="(item,index) in hasMovieInfo" :key="index">
-        <a href="#" @click.prevent="$router.push({path:'/movie_detail',query:{movie_id:item.movie_id}})"><img :src="server+item.poster" alt=""></a>
+      <el-carousel-item v-for="(item, index) in hasMovieInfo" :key="index">
+        <a href="#" @click.prevent="$router.push({path: '/movie_detail', query:{movieId: item.id}})"><img :src="item.poster" alt=""></a>
       </el-carousel-item>
     </el-carousel>
-    <div class="movie-info" v-for="(item,index) in hasMovieInfo" :key="index" v-show="movieIndex===Number(index)">
+    <div class="movie-info" v-for="(item,index) in hasMovieInfo" :key="index" v-show="movieIndex === Number(index)">
       <span class="arrow"></span>
-      <span class="main"><span class="name">{{item.name}}</span><span class="score"><span class="num" v-if="item.score">{{item.score.toFixed(1)}}分</span><span v-else style="font-size: .28rem">暂无评分</span></span></span>
+      <span class="main"><span class="name">{{ item.name }}</span><span class="score"><span class="num" v-if="item.score">{{ item.score.toFixed(1) }}分</span><span v-else style="font-size: .28rem">暂无评分</span></span></span>
       <span class="intro">
-        <span class="time">{{item.movie_long}}</span><span class="split">|</span><span class="type">{{item.type}}</span><span class="split">|</span><span class="actors">{{item.actor}}</span>
+        <span class="time">{{ item.movieLong }}</span><span class="split">|</span><span class="type">{{ item.type }}</span><span class="split">|</span><span class="actors">{{ item.actor }}</span>
       </span>
     </div>
     <ly-tab v-model="selectedId" :items="items" :options="options" class="ly-tab" v-if="hackReset" @change="changeLyTabItem" />
     <div class="ticket-container">
-      <div class="item" v-for="(item,index) in movieDaySchedule" :key="index">
+      <div class="item" v-for="(item, index) in movieDaySchedule" :key="index">
         <div class="left">
-          <span class="start-date">{{item.show_time}}</span>
-          <span class="end-date">{{endDate(item)}}散场</span>
+          <span class="start-date">{{ item.showTime }}</span>
+          <span class="end-date">{{ endDate(item) }}散场</span>
         </div>
         <div class="center">
           <div class="info">
-            <span class="language">{{item.language}}3D</span>
-            <span class="hall">{{item.hall_name}}</span>
+            <span class="language">{{ item.language }}3D</span>
+            <span class="hall">{{ item.hallName }}</span>
           </div>
-          <div class="price">{{item.price.toFixed(2)}}元</div>
+          <div class="price">{{ item.price.toFixed(2) }}元</div>
         </div>
         <div class="right">
-          <span class="buy-btn" @click="$router.push({path:'/select_seat',query:{cinema_id:item.cinema_id,movie_id:item.movie_id,schedule_id:item.schedule_id,}})">购票</span>
+          <span class="buy-btn" @click="$router.push({path: '/select_seat', query:{cinemaId: item.cinemaId, movieId: item.movieId, scheduleId: item.scheduleId,}})">购票</span>
         </div>
       </div>
     </div>
@@ -49,7 +49,7 @@ import { Indicator } from 'mint-ui'
 import { Carousel, CarouselItem } from 'element-ui'
 import LyTab from 'ly-tab'
 import { formatDate } from '@/common/utils/util'
-import { getCurrentCinemaDetail, getCurrentCinemaMovieSchedule } from '../../api/index'
+import { getCurrentCinemaDetail, getCurrentCinemaMovieSchedule } from '@/api/cinema'
 
 Vue.use(Carousel)
 Vue.use(CarouselItem)
@@ -60,19 +60,17 @@ export default {
   data() {
     return {
       initMovieId: 0,
-      //当前影院信息
+      // 当前影院信息
       currentCinemaInfo: {},
-      //影院的电影信息
+      // 影院的电影信息
       hasMovieInfo: [],
-      //所有的电影安排
+      // 所有的电影安排
       allMovieSchedule: [],
-      //电影某天的安排
+      // 电影某天的安排
       movieDaySchedule: [],
       hackReset: false,
       carouselReset: true,
       movieIndex: 0,
-      //服务器地址
-      server: 'http://localhost:3000',
       selectedId: 0,
       items: [],
       options: {
@@ -85,81 +83,104 @@ export default {
     this.loadCinemaDetail()
   },
   methods: {
-    async loadCinemaDetail() {
-      if (this.$route.query.cinema_id) {
-        let json = await getCurrentCinemaDetail(this.$route.query.cinema_id)
-        if (json.success_code === 200) {
-          this.currentCinemaInfo = json.data
-        }
-        json = await getCurrentCinemaMovieSchedule(this.$route.query.cinema_id)
-        if (json.success_code === 200) {
-          this.hasMovieInfo = json.data.hasMovieInfo
-          if (this.$route.query.movie_id) {
-            this.hasMovieInfo.forEach((val, index) => {
-              if (this.$route.query.movie_id == val.movie_id) {
-                this.initMovieId = index
-                this.carouselReset = false
-                this.$nextTick(() => {
-                  this.carouselReset = true
+    loadCinemaDetail() {
+      if (this.$route.query.cinemaId) {
+        getCurrentCinemaDetail({ cinemaId: this.$route.query.cinemaId })
+          .then(response => {
+            this.currentCinemaInfo = response.data
+
+            getCurrentCinemaMovieSchedule({ cinemaId: this.$route.query.cinemaId })
+              .then(response => {
+                response.data.hasMovieInfo.sort((a, b) => {
+                  return a.id - b.id
                 })
-              }
-            })
-          }
-          let movieScheduleInfo = json.data.movieScheduleInfo
-          let allMovieSchedule = []
-          movieScheduleInfo.forEach((value, index) => {
-            let movieDate = []
-            let movieInfo = []
-            value.forEach(val => {
-              if (new Date() - new Date(val.show_date + ',' + val.show_time) <= 0) {
-                let flag = true
-                movieDate.forEach(value => {
-                  if (value.label === val.show_date) {
-                    flag = false
-                  }
-                })
-                if (flag) {
-                  movieDate.push({ label: formatDate(new Date(val.show_date), true), date: val.show_date })
+                this.hasMovieInfo = response.data.hasMovieInfo
+                if (this.$route.query.movieId) {
+                  this.hasMovieInfo.forEach((val, index) => {
+                    if (this.$route.query.movieId == val.id) {
+                      this.initMovieId = index
+                      this.movieIndex = index
+                      this.carouselReset = false
+                      this.$nextTick(() => {
+                        this.carouselReset = true
+                      })
+                    }
+                  })
                 }
-                movieInfo.push({
-                  cinema_id: val.cinema_id,
-                  movie_id: val.movie_id,
-                  schedule_id: val.schedule_id,
-                  show_date: val.show_date,
-                  show_time: val.show_time,
-                  language: val.language,
-                  movie_long: val.movie_long,
-                  hall_name: val.hall_name,
-                  price: val.price
+                let movieScheduleInfo = response.data.movieScheduleInfo
+                movieScheduleInfo.forEach((value, index) => {
+                  let movieDate = []
+                  let movieInfo = []
+                  value.forEach(val => {
+                    let flag = true
+                    movieDate.forEach(value => {
+                      if (value.date === val.showDate) {
+                        flag = false
+                      }
+                    })
+                    if (flag) {
+                      movieDate.push({ label: formatDate(new Date(val.showDate), true), date: val.showDate })
+                    }
+                    movieInfo.push({
+                      cinemaId: val.cinemaId,
+                      movieId: val.movieId,
+                      scheduleId: val.scheduleId,
+                      showDate: val.showDate,
+                      showTime: val.showTime,
+                      language: val.language,
+                      movieLong: val.movieLong,
+                      hallName: val.hallName,
+                      price: val.price
+                    })
+                  })
+                  movieDate.sort((a, b) => {
+                    return a.date - b.date
+                  })
+                  this.allMovieSchedule[index] = { movieDate, movieInfo }
                 })
-              }
-            })
-            movieDate.sort((a, b) => {
-              return a.date - b.date
-            })
-            movieInfo.sort((a, b) => {
-              return a.date - b.date
-            })
-            this.allMovieSchedule[index] = { movieDate, movieInfo }
+                this.allMovieSchedule.sort((a, b) => {
+                  return a.movieInfo[0].movieId - b.movieInfo[0].movieId
+                })
+
+                if (this.initMovieId !== 0) {
+                  this.items = this.allMovieSchedule[this.initMovieId].movieDate
+                  this.hackReset = false
+                  this.$nextTick(() => {
+                    this.hackReset = true
+                  })
+                  this.allMovieSchedule[this.initMovieId].movieInfo.forEach(value => {
+                    if (value.showDate === this.allMovieSchedule[this.initMovieId].movieDate[0].date) {
+                      this.movieDaySchedule.push(value)
+                    }
+                  })
+                } else {
+                  this.items = this.allMovieSchedule[0].movieDate
+                  this.hackReset = false
+                  this.$nextTick(() => {
+                    this.hackReset = true
+                  })
+                  this.allMovieSchedule[0].movieInfo.forEach(value => {
+                    if (value.showDate === this.allMovieSchedule[0].movieDate[0].date) {
+                      this.movieDaySchedule.push(value)
+                    }
+                  })
+                }
+
+                this.movieDaySchedule.sort((a, b) => {
+                  return new Date(a.showDate + ',' + a.showTime) - new Date(b.showDate + ',' + b.showTime)
+                })
+                Indicator.close()
+              })
+              .catch(err => {
+                Indicator.close()
+              })
           })
-          this.items = this.allMovieSchedule[0].movieDate
-          this.hackReset = false
-          this.$nextTick(() => {
-            this.hackReset = true
+          .catch(err => {
+            Indicator.close()
           })
-          this.allMovieSchedule[0].movieInfo.forEach(value => {
-            if (value.show_date === this.allMovieSchedule[0].movieDate[0].date) {
-              this.movieDaySchedule.push(value)
-            }
-          })
-          this.movieDaySchedule.sort((a, b) => {
-            return new Date(a.show_date + ',' + a.show_time) - new Date(b.show_date + ',' + b.show_time)
-          })
-        }
       }
-      Indicator.close()
     },
-    //切换轮播图
+    // 切换轮播图
     changeCarousel(index) {
       this.movieIndex = index
       this.items = this.allMovieSchedule[index].movieDate
@@ -170,30 +191,30 @@ export default {
       this.selectedId = 0
       this.movieDaySchedule = []
       this.allMovieSchedule[index].movieInfo.forEach(value => {
-        if (value.show_date === this.allMovieSchedule[index].movieDate[0].date) {
+        if (value.showDate === this.allMovieSchedule[index].movieDate[0].date) {
           this.movieDaySchedule.push(value)
         }
       })
       this.movieDaySchedule.sort((a, b) => {
-        return new Date(a.show_date + ',' + a.show_time) - new Date(b.show_date + ',' + b.show_time)
+        return new Date(a.showDate + ',' + a.showTime) - new Date(b.showDate + ',' + b.showTime)
       })
     },
-    //切换日期
+    // 切换日期
     changeLyTabItem(item) {
       this.movieDaySchedule = []
       this.allMovieSchedule[this.movieIndex].movieInfo.forEach(value => {
-        if (value.show_date === item.date) {
+        if (value.showDate === item.date) {
           this.movieDaySchedule.push(value)
         }
       })
       this.movieDaySchedule.sort((a, b) => {
-        return new Date(a.show_date + ',' + a.show_time) - new Date(b.show_date + ',' + b.show_time)
+        return new Date(a.showDate + ',' + a.showTime) - new Date(b.showDate + ',' + b.showTime)
       })
     },
-    //影片结束时间
+    // 影片结束时间
     endDate(item) {
-      let h = parseInt(Number(item.show_time.split(':')[0]) + parseInt(item.movie_long) / 60)
-      let m = Number(item.show_time.split(':')[1]) + (parseInt(item.movie_long) % 60)
+      let h = parseInt(Number(item.showTime.split(':')[0]) + parseInt(item.movieLong) / 60)
+      let m = Number(item.showTime.split(':')[1]) + (parseInt(item.movieLong) % 60)
       if (m > 59) {
         return (h + parseInt(m / 60) < 10 ? '0' + (h + parseInt(m / 60)) : h + parseInt(m / 60)) + ':' + (m % 60 < 10 ? '0' + (m % 60) : m % 60)
       } else {

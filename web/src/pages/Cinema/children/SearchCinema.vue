@@ -10,7 +10,7 @@
     <div class="content">
       <div class="cinema-container" v-if="cinemaInfo.length">
         <!--<div class="title">影院</div>-->
-        <div class="item" v-for="(item, index) in cinemaInfo" :key="index" @click="$router.push({path:'/cinema_detail', query: {cinema_id: item.id}})">
+        <div class="item" v-for="(item, index) in cinemaInfo" :key="index" @click="$router.push({path:'/cinema_detail', query: {cinemaId: item.id}})">
           <div class="left">
             <div class="name ellipsis" v-html="ruleName(item.cinemaName)"></div>
             <div class="address ellipsis">{{ item.specifiedAddress }}</div>
