@@ -16,3 +16,12 @@ export function delOrderByUserId(query) {
     params: query
   })
 }
+
+// 用户下单
+export function order(data) {
+  return request({
+    url: '/api/order/order',
+    method: 'post',
+    data
+  })
+}

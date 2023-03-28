@@ -30,13 +30,13 @@
         </div>
         <div class="center">
           <div class="info">
-            <span class="language">{{ item.language }}3D</span>
+            <span class="language">{{ item.language }} 2D</span>
             <span class="hall">{{ item.hallName }}</span>
           </div>
           <div class="price">{{ item.price.toFixed(2) }}元</div>
         </div>
         <div class="right">
-          <span class="buy-btn" @click="$router.push({path: '/select_seat', query:{cinemaId: item.cinemaId, movieId: item.movieId, scheduleId: item.scheduleId,}})">购票</span>
+          <span class="buy-btn" @click="$router.push({path: '/select_seat', query: {cinemaId: item.cinemaId, movieId: item.movieId, scheduleId: item.scheduleId}})">购票</span>
         </div>
       </div>
     </div>
@@ -382,7 +382,7 @@ export default {
 
         .end-date {
           color: #888;
-          font-size: 0.25rem;
+          font-size: 0.1rem;
         }
       }
 
@@ -397,17 +397,16 @@ export default {
           display: flex;
           flex-flow: column;
           justify-content: center;
-          align-items: center;
           margin-left: 0.25rem;
 
           .language {
-            font-size: 0.28rem;
+            font-size: 0.1rem;
             margin-bottom: 0.12rem;
           }
 
           .hall {
             color: #888;
-            font-size: 0.25rem;
+            font-size: 0.1rem;
           }
         }
 

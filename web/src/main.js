@@ -10,6 +10,8 @@ import '@/permission'
 import "@/common/css/style.css"
 Vue.config.productionTip = false
 
+Vue.prototype.$cookies = cookies
+
 Vue.use(cookies)
 
 /* eslint-disable no-new */

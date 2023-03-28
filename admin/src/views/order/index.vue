@@ -149,7 +149,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="80px" align="center" label="支付类型">
+      <el-table-column width="80px" align="center" label="支付状态">
         <template slot-scope="{ row }">
           <el-tag :type="row.payType | payTypeFilter">
             {{ row.payType | parsepayType }}
