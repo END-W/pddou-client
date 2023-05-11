@@ -38,7 +38,7 @@
 <script>
 import { Indicator, MessageBox, Toast } from 'mint-ui'
 import { getScheduleById, updateScheduleSeat } from '@/api/schedule'
-import { order } from '../../api/index'
+import { order } from '@/api/order'
 
 export default {
   name: 'Pay',
@@ -195,21 +195,26 @@ export default {
             ticketNum: seatArr.length,
             ticketTotalPrice: this.$cookies.get('total_price'),
             orderSeatInfo: JSON.stringify(seatArr)
-          }).then(response => {
-            MessageBox.alert('您的取票码为:' + response.ticketCode, '支付成功')
           })
-          this.$cookies.remove('seat_1')
-          this.$cookies.remove('seat_2')
-          this.$cookies.remove('seat_3')
-          this.$cookies.remove('seat_4')
-          this.$cookies.remove('seat_count')
-          this.$cookies.remove('order_phone')
-          this.$cookies.remove('countdown_m')
-          this.$cookies.remove('countdown_s')
-          this.$cookies.remove('order_num')
-          this.$cookies.remove('total_price')
-          clearInterval(this.timer)
-          this.$router.push('/home')
+            .then(response => {
+              MessageBox.alert('您的取票码为:' + response.message, '支付成功')
+              this.$cookies.remove('seat_1')
+              this.$cookies.remove('seat_2')
+              this.$cookies.remove('seat_3')
+              this.$cookies.remove('seat_4')
+              this.$cookies.remove('seat_count')
+              this.$cookies.remove('order_phone')
+              this.$cookies.remove('countdown_m')
+              this.$cookies.remove('countdown_s')
+              this.$cookies.remove('order_num')
+              this.$cookies.remove('total_price')
+              clearInterval(this.timer)
+              this.$router.push('/home')
+            })
+            .catch(err => {
+              MessageBox.alert('支付失败')
+              this.back()
+            })
         }
       })
     }

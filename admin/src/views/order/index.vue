@@ -59,7 +59,7 @@
               v-model="listQuery.payType"
               clearable
               @clear="getOrdertList"
-              placeholder="请选择支付类型"
+              placeholder="请选择支付状态"
             >
               <el-option
                 v-for="item in payTypes"
@@ -90,7 +90,7 @@
       <el-table-column type="index" width="60px" align="center" label="ID">
       </el-table-column>
 
-      <el-table-column min-width="140px" align="center" label="用户名">
+      <el-table-column min-width="120px" align="center" label="用户名">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
@@ -119,7 +119,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="140px" align="center" label="订单号">
+      <el-table-column width="180px" align="center" label="订单号">
         <template slot-scope="scope">
           <span>{{ scope.row.orderNum }}</span>
         </template>
@@ -131,7 +131,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="80px" align="center" label="票数">
+      <el-table-column width="60px" align="center" label="票数">
         <template slot-scope="scope">
           <span>{{ scope.row.ticketNum }}</span>
         </template>

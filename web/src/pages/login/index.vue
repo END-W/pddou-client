@@ -12,7 +12,7 @@
       <div class="login-content">
         <div class="login-type">
           <span :class="{ active: loginType }" @click="changeLoginType">验证码登录</span>
-          <span :class="{ active: !loginType }" @click="changeLoginType">密码登录</span>
+          <!-- <span :class="{ active: !loginType }" @click="changeLoginType">密码登录</span> -->
         </div>
         <div class="login-main">
           <form>

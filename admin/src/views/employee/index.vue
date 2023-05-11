@@ -145,13 +145,13 @@
     />
 
     <!-- 添加员工的对话框 -->
-    <el-dialog title="添加员工" :visible.sync="addDialogVisible" width="50%">
+    <el-dialog title="添加员工" :visible.sync="addDialogVisible" width="30%">
       <!-- 内容主体 -->
       <el-form
         :model="addEmployeeForm"
         ref="addEmployeeFormRef"
         :rules="addEmployeeFormRules"
-        label-width="100px"
+        label-width="80px"
       >
         <el-form-item label="用户名" prop="username">
           <el-input v-model="addEmployeeForm.username"></el-input>

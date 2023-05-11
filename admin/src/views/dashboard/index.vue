@@ -1,32 +1,77 @@
 <template>
-  <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
-    <div class="dashboard-text">roles: <span v-for="role in roles" :key="role">{{ role }}</span></div>
+  <div class="dashboard-editor-container">
+    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+      <line-chart :chart-data="lineChartData" />
+    </el-row>
+
+    <el-row :gutter="32">
+      <el-col :xs="24" :sm="24" :lg="12">
+        <div class="chart-wrapper">
+          <pie-chart />
+        </div>
+      </el-col>
+      <el-col :xs="24" :sm="24" :lg="12">
+        <div class="chart-wrapper">
+          <bar-chart />
+        </div>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import LineChart from './components/LineChart'
+import PieChart from './components/PieChart'
+import BarChart from './components/BarChart'
+
+const lineChartData = {
+  newVisitis: {
+    actualData: [1200, 820, 910, 1540, 1620, 1400, 1450]
+  }
+}
 
 export default {
   name: 'Dashboard',
+  components: {
+    LineChart,
+    PieChart,
+    BarChart
+  },
   computed: {
     ...mapGetters([
       'name',
       'roles'
     ])
+  },
+  data() {
+    return {
+      lineChartData: lineChartData.newVisitis
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.dashboard {
-  &-container {
-    margin: 30px;
+.dashboard-editor-container {
+  padding: 32px;
+  background-color: rgb(240, 242, 245);
+  position: relative;
+  .github-corner {
+    position: absolute;
+    top: 0px;
+    border: 0;
+    right: 0;
   }
-  &-text {
-    font-size: 30px;
-    line-height: 46px;
+  .chart-wrapper {
+    background: #fff;
+    padding: 16px 16px 0;
+    margin-bottom: 32px;
+  }
+}
+@media (max-width:1024px) {
+  .chart-wrapper {
+    padding: 8px;
   }
 }
 </style>
