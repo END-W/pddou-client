@@ -345,7 +345,7 @@ export default {
         username: '',
         password: '123456',
         name: '',
-        email: '',
+        email: null,
         phone: '',
         gender: 'SECRET',
         userType: ''
@@ -361,10 +361,10 @@ export default {
           }
         ],
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-        email: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: validateEmail, trigger: 'blur' }
-        ],
+        // email: [
+        //   { required: true, message: '请输入邮箱', trigger: 'blur' },
+        //   { validator: validateEmail, trigger: 'blur' }
+        // ],
         phone: [
           { required: true, message: '请输入手机号码', trigger: 'blur' },
           { validator: validatePhone, trigger: 'blur' }
@@ -375,16 +375,16 @@ export default {
         id: '',
         userName: '',
         name: '',
-        email: '',
+        email: null,
         phone: '',
         gender: ''
       },
       editEmployeeFormRules: {
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-        email: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: validateEmail, trigger: 'blur' }
-        ],
+        // email: [
+        //   { required: true, message: '请输入邮箱', trigger: 'blur' },
+        //   { validator: validateEmail, trigger: 'blur' }
+        // ],
         phone: [
           { required: true, message: '请输入手机号码', trigger: 'blur' },
           { validator: validatePhone, trigger: 'blur' }

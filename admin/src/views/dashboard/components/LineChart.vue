@@ -67,9 +67,14 @@ export default {
       this.chart = echarts.init(this.$el, 'macarons')
       fetchBoxOffice({ role: this.roles[0] })
         .then(response => {
-          this.newChartData = response.data
-          if (this.newChartData.length < 7) {
-            for (let i = this.newChartData.length; i < 7; i++) {
+          console.log(response.data)
+          for (let i = 1; i <= 7; i++) {
+            for (let j = 0; j < response.data.length; j++) {
+              if (i === response.data[j].month) {
+                this.newChartData.push(response.data[j].total)
+              }
+            }
+            if (this.newChartData[i - 1] == null) {
               this.newChartData.push(0)
             }
           }
