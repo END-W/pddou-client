@@ -109,7 +109,7 @@ export default {
           return a.distance - b.distance
         })
         this.dateCinemaSchedule = list
-      }, 300)
+      }, 500)
     }
   }
 }

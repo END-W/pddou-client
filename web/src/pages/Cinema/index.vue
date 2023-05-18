@@ -74,7 +74,7 @@ export default {
               return a.distance - b.distance
             })
             this.jsonData = response.data
-          }, 300)
+          }, 500)
           Indicator.close()
         })
         .catch(err => {

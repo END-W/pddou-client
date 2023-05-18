@@ -15,3 +15,27 @@ export function removeOrderByStore(query) {
     params: query
   })
 }
+
+export function fetchBoxOffice(query) {
+  return request({
+    url: '/admin/boxOffice/getBoxOfficeData',
+    method: 'get',
+    params: query
+  })
+}
+
+export function fetchBoxOfficeDataByMovieType(query) {
+  return request({
+    url: '/admin/boxOffice/getBoxOfficeDataByMovieType',
+    method: 'get',
+    params: query
+  })
+}
+
+export function fetchBoxOfficeTop10(query) {
+  return request({
+    url: '/admin/boxOffice/getBoxOfficeTop10',
+    method: 'get',
+    params: query
+  })
+}

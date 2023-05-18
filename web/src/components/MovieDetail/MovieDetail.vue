@@ -10,7 +10,7 @@
         <div class="name">{{ jsonData.name }}</div>
         <div class="small type">类型：{{ jsonData.type }}</div>
         <div class="small ellipsis">主演：{{ jsonData.actor }}</div>
-        <div class="small play-time">片长：{{ jsonData.movieLong }}</div>
+        <div class="small play-time">片长：{{ jsonData.movieLong === '0分钟' ? '暂无' : jsonData.movieLong }}</div>
         <div class="small show-time">上映：{{ jsonData.publicDate }}上映</div>
       </div>
     </div>
@@ -84,7 +84,7 @@
         <span class="tips" v-if="!currentUserCommentData.length && !otherUserCommentData.length">暂无评论！</span>
       </div>
     </div>
-    <div class="buy" v-if="jsonData.isShow">
+    <div class="buy" v-if="jsonData.isShow && ((new Date(jsonData.publicDate).getTime() - 3 * 24 * 60 * 60 * 1000) < new Date().getTime())">
       <div 
         class="btn" 
         :class="{pre_sell: new Date(jsonData.publicDate) - new Date() > 0}" 

@@ -41,8 +41,14 @@ export const constantRoutes = [
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true,
-  },
+  }
+]
 
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ */
+export const asyncRoutes = [
   {
     path: '/',
     component: Layout,
@@ -55,17 +61,12 @@ export const constantRoutes = [
         meta: {
           title: '首页',
           icon: 'dashboard',
+          roles: ['SUPERADMIN', 'ADMIN', 'STORE', 'STAFF']
         },
       },
     ],
   },
-]
 
-/**
- * asyncRoutes
- * the routes that need to be dynamically loaded based on user roles
- */
-export const asyncRoutes = [
   {
     path: '/user',
     component: Layout,

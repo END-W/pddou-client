@@ -17,11 +17,18 @@
       </div>
       <span 
         class="buy" 
-        v-if="item.isShow" 
+        v-if="item.isShow && ((new Date(item.publicDate).getTime() - 3 * 24 * 60 * 60 * 1000) < new Date().getTime())" 
         :class="{pre_sell: new Date(item.publicDate) - new Date() > 0}" 
         @click="$router.push({path: '/select_cinema', query: {movieId: item.id, name: item.name}})
       ">
         {{ new Date(item.publicDate) - new Date() > 0 ? '预售': '购票' }}
+      </span>
+      <span 
+        class="buy wish" 
+        v-else-if="item.isShow"
+        @click="$router.push({path: '/movie_detail', query: {movieId: item.id}})
+      ">
+        想看
       </span>
     </div>
   </div>
@@ -87,6 +94,7 @@ export default {
     }
 
     .descInfo {
+      width: 3.7rem;
       padding-bottom: 0.12rem;
 
       .number {
@@ -106,6 +114,10 @@ export default {
     width: 12%;
     padding: 0.16rem 0.12rem;
     text-align: center;
+  }
+
+  .wish {
+    background-color: orange;
   }
 
   .pre_sell {

@@ -317,7 +317,7 @@ export default {
     disabledDate(time) {
       if (this.addScheduleForm.movieId) {
         if (new Date(this.addScheduleForm.publicDate) - new Date() > 0) {
-          return time.getTime() < new Date(this.addScheduleForm.publicDate)
+          return time.getTime() < (new Date(this.addScheduleForm.publicDate).getTime() - 24 * 60 * 60 * 1000)
         } else {
           return time.getTime() < new Date()
         }

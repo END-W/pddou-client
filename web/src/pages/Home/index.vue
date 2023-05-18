@@ -58,7 +58,8 @@
               <div class="name ellipsis">{{ item.name }}</div>
               <div class="info">
                 <span class="date">{{ item.publicDate.split('-')[1] }}月{{ item.publicDate.split('-')[2] }}日</span>
-                <span class="btn" @click="$router.push({path:'/select_cinema', query: {movieId: item.id, name: item.name}})">预售</span>
+                <span class="btn" v-if="(new Date(item.publicDate).getTime() - 3 * 24 * 60 * 60 * 1000) < new Date().getTime()" @click="$router.push({path:'/select_cinema', query: {movieId: item.id, name: item.name}})">预售</span>
+                <span class="btn wish" v-else @click="$router.push({path:'/movie_detail', query: {movieId: item.id}})">想看</span>
               </div>
             </div>
           </div>
@@ -391,6 +392,11 @@ export default {
                 background-color: #2d98f3;
                 border-radius: 0.2rem;
                 box-shadow: 0.02rem 0.02rem 0.08rem #2d98f3;
+              }
+
+              .wish {
+                background-color: orange;
+                box-shadow: 0.02rem 0.02rem 0.08rem orange;
               }
             }
           }

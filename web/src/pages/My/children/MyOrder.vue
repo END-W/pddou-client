@@ -26,7 +26,7 @@
           <div class="price"><span class="num">{{ '共' + item.ticketNum }}张</span> 实付款￥<span class="totalPrice">{{ item.ticketTotalPrice | parsePrice }}</span></div>
         </div>
         <div class="item-bottom2">
-          <div class="del"><span @click="delOrderByUserId(item.id)">删除订单</span></div>
+          <div v-if="isShow(item)" class="del"><span @click="delOrderByUserId(item.id)">申请退票</span></div>
         </div>
       </div>
     </div>
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { Indicator, Toast } from 'mint-ui'
+import { Indicator, MessageBox, Toast } from 'mint-ui'
 import { getToken } from '@/common/utils/auth'
 import { getOrderByUserId, delOrderByUserId } from '@/api/order'
 
@@ -82,20 +82,36 @@ export default {
         return parseInt(num / 10) + 1 + '排' + (num % 10) + '座'
       }
     },
+    isShow(item) {
+      if (item.payType != 'PAID')
+        return false
+      let date = item.showDate
+      let time = date + ' ' + item.showTime
+      time = time.replace(/-/g, '/')
+      let showTime = new Date(time).getTime()
+      let now = new Date().getTime() - 5 * 60 * 1000
+
+      if (now < showTime)
+        return true
+
+      return false
+    },
     delOrderByUserId(id) {
       delOrderByUserId({orderId: id}).then(response => {
         this.loadInfo()
-        Toast({
-          message: "删除订单成功",
-          position: "middle",
-          duration: 2000
-        })
+        MessageBox.alert('申请退票成功')
+        // Toast({
+        //   message: "删除订单成功",
+        //   position: "middle",
+        //   duration: 2000
+        // })
       }).catch(err => {
-        Toast({
-          message: "删除订单失败",
-          position: "middle",
-          duration: 2000
-        })
+        MessageBox.alert('申请退票失败')
+        // Toast({
+        //   message: "删除订单失败",
+        //   position: "middle",
+        //   duration: 2000
+        // })
       })
     }
   }

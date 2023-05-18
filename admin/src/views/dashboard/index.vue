@@ -20,15 +20,12 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import LineChart from './components/LineChart'
 import PieChart from './components/PieChart'
 import BarChart from './components/BarChart'
 
 const lineChartData = {
-  newVisitis: {
-    actualData: [1200, 820, 910, 1540, 1620, 1400, 1450]
-  }
+  actualData: [1200, 820, 910, 1540, 1620, 1400, 1450]
 }
 
 export default {
@@ -38,15 +35,9 @@ export default {
     PieChart,
     BarChart
   },
-  computed: {
-    ...mapGetters([
-      'name',
-      'roles'
-    ])
-  },
   data() {
     return {
-      lineChartData: lineChartData.newVisitis
+      lineChartData: lineChartData.actualData
     }
   }
 }

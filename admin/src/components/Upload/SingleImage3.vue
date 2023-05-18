@@ -105,7 +105,7 @@ export default {
   }
   .image-preview {
     width: 200px;
-    height: 200px;
+    height: 300px;
     position: relative;
     border: 1px dashed #d9d9d9;
     float: left;

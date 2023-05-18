@@ -1,14 +1,16 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+  <div :class="className" :style="{ height: height, width: width }" />
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 // import resize from './mixins/resize'
+import { fetchBoxOffice } from '@/api/order'
 
 export default {
-//   mixins: [resize],
+  //   mixins: [resize],
   props: {
     className: {
       type: String,
@@ -27,13 +29,17 @@ export default {
       default: true
     },
     chartData: {
-      type: Object,
+      type: Array,
       required: true
     }
   },
+  computed: {
+    ...mapGetters(['name', 'roles'])
+  },
   data() {
     return {
-      chart: null
+      chart: null,
+      newChartData: []
     }
   },
   watch: {
@@ -59,15 +65,28 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
-      this.setOptions(this.chartData)
+      fetchBoxOffice({ role: this.roles[0] })
+        .then(response => {
+          this.newChartData = response.data
+          if (this.newChartData.length < 7) {
+            for (let i = this.newChartData.length; i < 7; i++) {
+              this.newChartData.push(0)
+            }
+          }
+          this.setOptions(this.newChartData)
+        })
+        .catch(() => {
+          this.newChartData = this.chartData
+          this.setOptions(this.newChartData)
+        })
     },
-    setOptions({ actualData } = {}) {
+    setOptions(actualData) {
       this.chart.setOption({
         title: {
           text: '票房统计',
           // 控制标题位置
-          x:'left',
-        //   y:'top'
+          x: 'left'
+          //   y:'top'
         },
         xAxis: {
           data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月'],
@@ -98,26 +117,28 @@ export default {
         legend: {
           data: ['营业额']
         },
-        series: [{
-          name: '营业额',
-          smooth: true,
-          type: 'line',
-          itemStyle: {
-            normal: {
-              color: '#3888fa',
-              lineStyle: {
+        series: [
+          {
+            name: '营业额',
+            smooth: true,
+            type: 'line',
+            itemStyle: {
+              normal: {
                 color: '#3888fa',
-                width: 2
-              },
-              areaStyle: {
-                color: '#f3f8ff'
+                lineStyle: {
+                  color: '#3888fa',
+                  width: 2
+                },
+                areaStyle: {
+                  color: '#f3f8ff'
+                }
               }
-            }
-          },
-          data: actualData,
-          animationDuration: 2800,
-          animationEasing: 'quadraticOut'
-        }]
+            },
+            data: actualData,
+            animationDuration: 2800,
+            animationEasing: 'quadraticOut'
+          }
+        ]
       })
     }
   }
